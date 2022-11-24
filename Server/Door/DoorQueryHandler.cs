@@ -1,23 +1,21 @@
-﻿using HttpServer.Door;
-using Server.Core;
+﻿using Server.Core;
 using Server.Door.Queries;
 using Server.Door.Responses;
 
-namespace Server.Door
+namespace Server.Door;
+
+public class DoorQueryHandler
+    : Define.IQuery<DoorSettingsQuery, DoorSettingResponse>
 {
-    public class DoorQueryHandler
-        : Define.IQuery<DoorSettingsQuery, DoorSettingRespone>
+    readonly DoorMqttClient _client;
+
+    public DoorQueryHandler(DoorMqttClient client)
     {
-        readonly DoorMqttClient _client;
+        _client = client;
+    }
 
-        public DoorQueryHandler(DoorMqttClient client)
-        {
-            _client = client;
-        }
-
-        public DoorSettingRespone Consume(IQueryContext consumeContext, DoorSettingsQuery request)
-        {
-            return new DoorSettingRespone { Enable = true, Password = _client.Password };
-        }
+    public DoorSettingResponse Consume(IQueryContext consumeContext, DoorSettingsQuery request)
+    {
+        return new DoorSettingResponse { Enable = true, Password = _client.Password };
     }
 }

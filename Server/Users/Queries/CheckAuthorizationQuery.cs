@@ -1,12 +1,11 @@
 ﻿using Server.Core;
-using Server.Core.Session;
 using Server.HttpServer;
+using Server.Session;
 
-namespace HttpServer.Users.Queries
+namespace Server.Users.Queries;
+
+[WebPost]
+[Session]
+public class CheckAuthorizationQuery : Define.IRequest
 {
-    [WebPost]
-    [Session]
-    public class CheckAuthorizationQuery : Define.IRequest
-    {
-    }
 }

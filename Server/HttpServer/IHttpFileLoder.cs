@@ -1,6 +1,8 @@
-﻿namespace Server.HttpServer;
+﻿using System.Threading.Tasks;
+
+namespace Server.HttpServer;
 
 public interface IHttpFileLoader
 {
-    bool TryGetWebFileContent(string[] path, out byte[] content);
+    Task<byte[]> TryGetWebFileContent(string[] path);
 }

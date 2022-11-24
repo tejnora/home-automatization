@@ -2,7 +2,6 @@
 using BTDB.IOC;
 using BTDB.KVDBLayer;
 using Server.Configuration;
-using Server.Core.MessageMapping;
 using System;
 using Server.Storage;
 using Serilog;
@@ -10,6 +9,8 @@ using IContainer = BTDB.IOC.IContainer;
 using Server.HttpServer;
 using Server.Core;
 using System.IO;
+using Server.Tools.MessageMapping;
+using Server.Session;
 
 namespace Server
 {
@@ -17,6 +18,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            LocConfiguration();
             NameAndVersionReporter.Print();
             UnhandledExceptionHandler.AttachHandlers();
             var options = InitServerOptions();
@@ -24,9 +26,11 @@ namespace Server
             builder.RegisterType<HttpServer.HttpServer>().As<IHttpServer>().SingleInstance();
             builder.RegisterInstance(options).As<ServerOptions>();
             builder.RegisterInstance(new OnDiskFileCollection(options.DatabaseCollectionPath)).As<IFileCollection>();
-            builder.RegisterType<DataStorage>().As<IDataStorage>().As<IRestApi>().SingleInstance();
             builder.RegisterType<Clock>().As<IClock>().SingleInstance();
             builder.RegisterType<WebCommandsList>().AsSelf().SingleInstance();
+            builder.RegisterType<DataStorage>().As<IDataStorage>().SingleInstance();
+            builder.RegisterType<SessionMiddlewareApi>().As<IRestApi>().SingleInstance();
+            builder.RegisterType<SessionManager>().As<ISessionManager>().SingleInstance();
 #if DEBUG
             builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
 #else
@@ -37,6 +41,13 @@ namespace Server
             Run(container);
         }
 
+        static void LocConfiguration()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .MinimumLevel.Debug()
+                .CreateLogger();
+        }
         static void RegisterCommandHandlers(ContainerBuilder builder)
         {
             var commandHandlers = AssemblyScaner.GetCommandHandlers(new[]

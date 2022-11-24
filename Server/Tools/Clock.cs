@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Server.Tools
+namespace Server.Tools;
+
+class Clock
+    : IClock
 {
-    class Clock
-        : IClock
-    {
-        public DateTime UtcNow => DateTime.UtcNow;
-    }
+    public DateTime UtcNow => DateTime.UtcNow;
 }

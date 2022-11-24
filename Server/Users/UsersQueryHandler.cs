@@ -1,18 +1,17 @@
-﻿using HttpServer.Users.Queries;
-using Server.Core;
+﻿using Server.Core;
+using Server.Users.Queries;
 
-namespace Server.Users
+namespace Server.Users;
+
+public class UsersQueryHandler
+    : Define.IQuery<CheckAuthorizationQuery, GeneralResponses>
 {
-    public class UsersQueryHandler
-        : Define.IQuery<CheckAuthorizationQuery, GeneralResponses>
+    public UsersQueryHandler()
     {
-        public UsersQueryHandler()
-        {
-        }
+    }
 
-        public GeneralResponses Consume(IQueryContext consumeContext, CheckAuthorizationQuery request)
-        {
-            return GeneralResponses.Success;
-        }
+    public GeneralResponses Consume(IQueryContext consumeContext, CheckAuthorizationQuery request)
+    {
+        return GeneralResponses.Success;
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Server.Core
+namespace Server.Core;
+
+public class QueryContextBase : IQueryContext
 {
-    public class QueryContextBase : IQueryContext
+    public QueryContextBase(HttpContext httpContext)
     {
-        public QueryContextBase(HttpContext httpContext)
-        {
-            SessionId = httpContext.Request.Cookies["session-id"];
-        }
-        public string SessionId { get; }
+        SessionId = httpContext.Request.Cookies["session-id"];
     }
+    public string SessionId { get; }
 }

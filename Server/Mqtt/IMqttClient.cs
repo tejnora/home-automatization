@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace Server.Core.Mqtt
+namespace Server.Mqtt;
+
+public interface IMqttClient
 {
-    public interface IMqttClient
-    {
-        bool Publish(string topic, string paiload);
-        void Subscribe(string topic, Action<string> callBack);
-    }
+    bool Publish(string topic, string paiload);
+    void Subscribe(string topic, Action<string> callBack);
 }

@@ -1,16 +1,14 @@
-﻿using System;
-using Serilog;
+﻿using Serilog;
 
-namespace Server.Tools
+namespace Server.Tools;
+
+public static class NameAndVersionReporter
 {
-    public static class NameAndVersionReporter
+    public static void Print()
     {
-        public static void Print()
-        {
-            var message = System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " + Version;
-            Log.Information(message);
-        }
-
-        public static string Version => System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+        var message = System.Reflection.Assembly.GetEntryAssembly().GetName().Name + " " + Version;
+        Log.Information(message);
     }
+
+    public static string Version => System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 }

@@ -1,7 +1,6 @@
-﻿namespace Server.Core
+﻿namespace Server.Core;
+
+public interface IQueryContext
 {
-    public interface IQueryContext
-    {
-        string SessionId { get; }
-    }
+    string SessionId { get; }
 }

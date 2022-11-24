@@ -1,13 +1,28 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Server.HttpServer
+namespace Server.HttpServer;
+
+class DebugHttpFileLoader
+    : IHttpFileLoader
 {
-    class DebugHttpFileLoader
-        : IHttpFileLoader
+    static readonly string RootPath = @"e:\Repozitories\home-automatization\www\";
+    public async Task<byte[]> TryGetWebFileContent(string[] path)
     {
-        public bool TryGetWebFileContent(string[] path, out byte[] content)
+        var finalPath = Path.Combine(RootPath, Path.Combine(path));
+        if (!File.Exists(finalPath))
         {
-            throw new NotImplementedException();
+            return await Task.FromResult<byte[]>(null);
         }
+        try
+        {
+            return  await File.ReadAllBytesAsync(finalPath);
+        }
+        catch
+        {
+            return await Task.FromResult<byte[]>(null);
+        }
+        
     }
 }

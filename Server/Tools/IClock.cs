@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Server.Tools
+namespace Server.Tools;
+
+public interface IClock
 {
-    public interface IClock
-    {
-        DateTime UtcNow { get; }
-    }
+    DateTime UtcNow { get; }
 }

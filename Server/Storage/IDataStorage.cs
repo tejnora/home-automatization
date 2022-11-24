@@ -1,6 +1,5 @@
-﻿namespace Server.Storage
+﻿namespace Server.Storage;
+
+public interface IDataStorage
 {
-    public interface IDataStorage
-    {
-    }
 }

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Core
+namespace Server.Core;
+
+public interface IRestApi
 {
-    public interface IRestApi
-    {
-        Task<List<Define.IResponse>> Command(ICommandContext commadContext, Define.ICommand commnad);
-        Task<Define.IResponse> Query(IQueryContext queryContext, Define.IRequest query);
-    }
+    Task<List<Define.IResponse>> Command(ICommandContext commandContext, Define.ICommand commnad);
+    Task<Define.IResponse> Query(IQueryContext queryContext, Define.IRequest query);
 }

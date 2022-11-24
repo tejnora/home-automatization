@@ -1,12 +1,11 @@
 ﻿using BTDB.IOC;
 
-namespace Server.Users
+namespace Server.Users;
+
+public class AppUsersBuilder
 {
-    public class AppUsersBuilder
+    public static void Build(ContainerBuilder builder)
     {
-        public static void Build(ContainerBuilder builder)
-        {
-            //AppBuilder.RegisterCommandQueryHandlers(builder, "HttpServer.Users");
-        }
+        //AppBuilder.RegisterCommandQueryHandlers(builder, "HttpServer.Users");
     }
 }

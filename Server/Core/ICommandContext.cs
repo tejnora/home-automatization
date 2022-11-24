@@ -1,7 +1,6 @@
-﻿namespace Server.Core
+﻿namespace Server.Core;
+
+public interface ICommandContext
 {
-    public interface ICommandContext
-    {
-        string SessionId { get; }
-    }
+    string SessionId { get; }
 }

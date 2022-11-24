@@ -1,12 +1,11 @@
 ﻿using Server.Core;
-using Server.Core.Session;
 using Server.HttpServer;
+using Server.Session;
 
-namespace Server.Door.Queries
+namespace Server.Door.Queries;
+
+[WebPost]
+[Session]
+public class DoorSettingsQuery:Define.IRequest
 {
-    [WebPost]
-    [Session]
-    public class DoorSettingsQuery:Define.IRequest
-    {
-    }
 }

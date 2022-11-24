@@ -1,14 +1,13 @@
 ﻿using Server.Core;
-using Server.Core.Session;
 using Server.HttpServer;
+using Server.Session;
 
-namespace Server.Door.Commands
+namespace Server.Door.Commands;
+
+[WebPost]
+[Session]
+public class UpdateDoorSettingsCommand : Define.ICommand
 {
-    [WebPost]
-    [Session]
-    public class UpdateDoorSettingsCommand : Define.ICommand
-    {
-        public bool Enable { get; set; }
-        public string Password { get; set; }
-    }
+    public bool Enable { get; set; }
+    public string Password { get; set; }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Server.Core.Session
+namespace Server.Session;
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+public class SessionAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class SessionAttribute : Attribute
-    {
-    }
 }

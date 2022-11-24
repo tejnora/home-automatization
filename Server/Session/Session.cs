@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Server.Core.Session
+namespace Server.Session;
+
+public class Session
 {
-    public class Session
-    {
-        public string SessionId;
-        public string UserName;
-        public DateTime Created;
-    }
+    public string SessionId;
+    public string UserName;
+    public DateTime Created;
 }
