@@ -66,7 +66,7 @@ namespace Server
         {
             return new ServerOptions
             {
-                DatabaseCollectionPath = Path.GetFullPath(DatabaseConfigSection.GetConfiguration().DiskFileCollection),
+                DatabaseCollectionPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath),DatabaseConfigSection.GetConfiguration().DiskFileCollection),
                 HttpServerConnectionPort = 80,
                 MqttClientAddress= "tcp://192.168.88.250:1883"
             };

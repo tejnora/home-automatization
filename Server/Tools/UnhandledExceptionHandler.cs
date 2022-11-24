@@ -74,6 +74,6 @@ public static class UnhandledExceptionHandler
 
     static void FirstChanceHandler(object sender, FirstChanceExceptionEventArgs e)
     {
-        Log.Debug(e.ToString());
+        Log.Debug(e.Exception.ToString());
     }
 }

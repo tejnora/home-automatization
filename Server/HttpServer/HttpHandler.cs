@@ -72,7 +72,7 @@ public class HttpHandler
                 }
                 SetSuccessStatus(httpContext);
                 SetResponseHeaders(httpContext.Response, requestPathFragments);
-                httpContext.Response.Body.Write(fileContent, 0, fileContent.Length);
+                await httpContext.Response.Body.WriteAsync(fileContent, 0, fileContent.Length);
             }
         });
     }
