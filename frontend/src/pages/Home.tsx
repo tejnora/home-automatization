@@ -8,6 +8,12 @@ type HomeProps = {
 
 const Home = ({ setAuth }: HomeProps) => {
     const theme = useTheme();
+
+    function handleLogout(e: React.SyntheticEvent) {
+        console.log("submit");
+        setAuth(false);
+    }
+
     return (
         <Container
             maxWidth="lg"
@@ -37,7 +43,7 @@ const Home = ({ setAuth }: HomeProps) => {
             >
                 Welcome Back
             </Typography>
-            <Button size="large" variant="contained" onClick={() => setAuth(false)}>
+            <Button size="large" variant="contained" onClick={handleLogout}>
                 Log out
             </Button>
         </Container>

@@ -31,4 +31,4 @@ MqttDotNet
 *.opendb
 *.db
 BTDB
-**.vs/
+.vs/

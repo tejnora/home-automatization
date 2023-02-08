@@ -1,6 +1,6 @@
 import { useState } from "react";
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 import {
     Container,
@@ -42,10 +42,14 @@ type LoginProps = {
 
 const Login = ({ setAuth }: LoginProps) => {
     const [showPassword, setShowPassword] = useState(false);
-    
-    function handleSubmit(e: React.SyntheticEvent){
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+
+    function handleSubmit(e: React.SyntheticEvent) {
         console.log("submit");
         setAuth(true);
+        navigate(from, { replace: true });
     }
     return (
         <RootStyle>
@@ -89,7 +93,7 @@ const Login = ({ setAuth }: LoginProps) => {
                                 sx={{ my: 2 }}
                             >
                                 <FormControlLabel
-                                    control={<Checkbox/>}
+                                    control={<Checkbox />}
                                     label="Remember me"
                                 />
                                 <Link
@@ -101,7 +105,7 @@ const Login = ({ setAuth }: LoginProps) => {
                                     Forgot password?
                                 </Link>
                             </Stack>
-                            <Box textAlign='center'><Button type="submit" variant="contained" onClick={handleSubmit}>"Login"</Button></Box>
+                            <Box textAlign='center'><Button type="submit" variant="contained" onClick={handleSubmit}>Login</Button></Box>
                         </Box>
                     </FormControl>
                 </ContentStyle>
