@@ -1,17 +1,15 @@
 import { Button, Typography, Container, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-//////////////////////////////////////
+import { observer } from "mobx-react-lite";
+import { useService } from "../services/useService"
 
-type HomeProps = {
-    setAuth: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const Home = ({ setAuth }: HomeProps) => {
+export const HomeView = observer(() => {
+    const authentification = useService().Authentification;
     const theme = useTheme();
 
     function handleLogout(e: React.SyntheticEvent) {
-        console.log("submit");
-        setAuth(false);
+        authentification.logout();
+        console.info("logout");
     }
 
     return (
@@ -48,5 +46,5 @@ const Home = ({ setAuth }: HomeProps) => {
             </Button>
         </Container>
     );
-};
-export default Home;
+});
+export default HomeView;

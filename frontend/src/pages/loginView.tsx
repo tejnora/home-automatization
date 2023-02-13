@@ -1,6 +1,8 @@
 import { useState } from "react";
-import React from "react";
+import React, { useRef } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { useService } from "../services/useService"
+import { observer } from "mobx-react-lite";
 
 import {
     Container,
@@ -36,20 +38,23 @@ const ContentStyle = styled("div")({
     background: "#fff",
 });
 
-type LoginProps = {
-    setAuth: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const Login = ({ setAuth }: LoginProps) => {
+export const LoginView = observer(() => {
+    const authentification = useService().Authentification;
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
+    const userNameRef = useRef<HTMLInputElement>(null)
+    const passwordRef = useRef<HTMLInputElement>(null)
 
-    function handleSubmit(e: React.SyntheticEvent) {
-        console.log("submit");
-        setAuth(true);
-        navigate(from, { replace: true });
+    async function handleSubmit(e: React.SyntheticEvent) {
+        let userName = userNameRef.current?.value;
+        let password = passwordRef.current?.value;
+        if(!(userName && password))return;
+        var res = await authentification.login(userName, password)
+        if (res) {
+            navigate(from, { replace: true });
+        }
     }
     return (
         <RootStyle>
@@ -67,13 +72,15 @@ const Login = ({ setAuth }: LoginProps) => {
                                 fullWidth
                                 autoComplete="username"
                                 type="email"
-                                label="Email Address"
+                                label="User name"
+                                inputRef={userNameRef}
                             />
                             <TextField
                                 fullWidth
                                 autoComplete="current-password"
                                 type={showPassword ? "text" : "password"}
                                 label="Password"
+                                inputRef={passwordRef}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -112,5 +119,4 @@ const Login = ({ setAuth }: LoginProps) => {
             </Container>
         </RootStyle >
     );
-};
-export default Login;
+});

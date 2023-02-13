@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter } from "react-router-dom";
+import { ServicesProvider } from "./services/serviceProvider"
+import { ApplicationServices } from "./services/applicationServices"
+
+const services = new ApplicationServices();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -11,7 +15,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <HashRouter>
-      <App />
+      <ServicesProvider value={services}>
+        <App />
+      </ServicesProvider>
     </HashRouter>
   </React.StrictMode>
 );
