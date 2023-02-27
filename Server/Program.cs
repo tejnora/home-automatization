@@ -10,7 +10,7 @@ using Server.HttpServer;
 using Server.Core;
 using System.IO;
 using Server.Tools.MessageMapping;
-using Server.Session;
+using Server.Authentication;
 
 namespace Server
 {

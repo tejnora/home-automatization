@@ -123,7 +123,7 @@ public class HttpHandler
         {
             var commandObject = await CreateCommand(requestType, context);
             var responseDto = await _restApi.Command(new CommandContextBase(context), commandObject);
-            await ReturnJson(responseDto, context);
+            await ReturnJson(responseDto.First(), context);
         }
         catch (Exception ex)
         {
@@ -144,9 +144,9 @@ public class HttpHandler
     static async Task ReturnJson(object data, HttpContext httpContext)
     {
         var jsonData = JsonSerializer.Serialize(data, JsonSerializerOptions);
-        httpContext.Response.StatusCode = 200;
         httpContext.Response.ContentType = "application/json;charset=utf8";
         await httpContext.Response.Body.WriteAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(jsonData)));
+        httpContext.Response.StatusCode = 200;
     }
 
     void SetResponseHeaders(HttpResponse response, IEnumerable<string> requestPathFragments, bool allowCache = false)

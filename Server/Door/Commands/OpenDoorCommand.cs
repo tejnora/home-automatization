@@ -1,6 +1,6 @@
-﻿using Server.Core;
+﻿using Server.Authentication;
+using Server.Core;
 using Server.HttpServer;
-using Server.Session;
 
 namespace Server.Door.Commands;
 

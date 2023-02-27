@@ -1,10 +1,10 @@
 import { makeAutoObservable } from "mobx";
-import AutentificationService from "./autenticationService"
+import AuthenticationService from "./autentication/authenticationService"
 
 export class ApplicationServices {
-    Authentification: AutentificationService;
+    Authentification: AuthenticationService;
     constructor() {
         makeAutoObservable(this);
-        this.Authentification = new AutentificationService();
+        this.Authentification = new AuthenticationService();
     }
 }

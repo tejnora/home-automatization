@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Server.Core;
 using Server.Storage;
 
-namespace Server.Session;
+namespace Server.Authentication;
 
 public class SessionMiddlewareApi
     : IRestApi

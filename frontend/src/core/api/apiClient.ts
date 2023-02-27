@@ -1,6 +1,4 @@
-import AppConfig from '../../appConfig';
 import Axios, { AxiosInstance } from 'axios';
-import { ApiConfiguration, apiConfiguration } from './apiConfiguration';
 import { Logger } from "../logger"
 
 export interface IApiClient {
@@ -13,27 +11,24 @@ export interface IApiClient {
 class ApiClient implements IApiClient {
   private client: AxiosInstance;
 
-  protected createAxiosClient(apiConfiguration: ApiConfiguration): AxiosInstance {
+  protected createAxiosClient(): AxiosInstance {
     return Axios.create({
-      baseURL: AppConfig.baseURL,
+      baseURL: /*AppConfig.baseURL*/"",
       responseType: 'json' as const,
       headers: {
         'Content-Type': 'application/json',
-        ...(apiConfiguration.accessToken && {
-          Authorization: `Token ${apiConfiguration.accessToken}`,
-        }),
       },
       timeout: 10 * 1000,
     });
   }
 
-  constructor(apiConfiguration: ApiConfiguration) {
-    this.client = this.createAxiosClient(apiConfiguration);
+  constructor() {
+    this.client = this.createAxiosClient();
   }
 
   async post<TResponse>(path: string, payload: any): Promise<TResponse> {
     try {
-      const response = await this.client.post<TResponse>(path, payload);
+      const response = await this.client.post<TResponse>(path, payload, {withCredentials: true});
       return response.data;
     } catch (error) {
       Logger.logServiceError(error);
@@ -72,4 +67,4 @@ class ApiClient implements IApiClient {
   }
 }
 
-export const apiClient = new ApiClient(apiConfiguration);
+export const apiClient = new ApiClient();

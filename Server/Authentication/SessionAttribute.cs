@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server.Session;
+namespace Server.Authentication;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 public class SessionAttribute : Attribute

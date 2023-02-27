@@ -1,9 +1,9 @@
 
 export enum ResponseStatus {
-    Success = 0,
-    Failed
+    Success = "Success",
+    Failed = "Failed"
 }
 
 export interface IResponseBase {
-    status: ResponseStatus;
+    Result: ResponseStatus;
 }

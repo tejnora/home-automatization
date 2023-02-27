@@ -5,11 +5,15 @@ import { HomeView } from "./pages/homeView";
 import { LoginView } from "./pages/loginView";
 import { useService } from './services/useService';
 import { useObserver } from "mobx-react-lite";
+import {getPernamentSessionId} from  "./core/cookie";
 import './App.css';
 
 function App() {
   const location = useLocation();
   const auth = useService().Authentification;
+  if(!auth.logged && getPernamentSessionId()){
+    
+  }
   return useObserver(() => {
     return (
       <>

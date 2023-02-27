@@ -1,8 +1,7 @@
 ﻿using Server.Core;
 using Server.HttpServer;
-using Server.Session;
 
-namespace Server.Users.Commands;
+namespace Server.Authentication.Commands;
 
 [WebPost]
 [Session]
