@@ -1,22 +1,24 @@
-import { useState } from 'react';
 import { CssBaseline } from "@mui/material";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { HomeView } from "./pages/homeView";
 import { LoginView } from "./pages/loginView";
 import { useService } from './services/useService';
 import { useObserver } from "mobx-react-lite";
-import {getPernamentSessionId} from  "./core/cookie";
+import {  ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css';
+
+const theme = createTheme();
 
 function App() {
   const location = useLocation();
   const auth = useService().Authentification;
-  if(!auth.logged && getPernamentSessionId()){
-    
-  }
+/*  if(!auth.logged && getPernamentSessionId()){
+    auth.tryPernamentLogin()
+  }*/
   return useObserver(() => {
     return (
       <>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
           <Route path="/login" element={<LoginView />} />
@@ -25,6 +27,7 @@ function App() {
             element={auth.logged ? (<HomeView />) : (<Navigate to="/login" state={{ from: location }} replace />)}
           />
         </Routes>
+        </ThemeProvider>
       </>
     )
   });
