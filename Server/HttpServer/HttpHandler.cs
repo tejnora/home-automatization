@@ -13,6 +13,7 @@ using Serilog;
 using Server.Core;
 using Server.Tools;
 using Server.Tools.JsonSerializer;
+using Share;
 
 namespace Server.HttpServer;
 

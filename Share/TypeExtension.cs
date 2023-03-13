@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Server.Tools;
-
-static class TypeExtension
+﻿namespace Share;
+public static class TypeExtension
 {
     public static bool InheritsOrImplements(this Type child, Type[] parents)
     {
@@ -35,7 +30,7 @@ static class TypeExtension
 
     public static IEnumerable<Type> ListMessagesConsumedByInterfaces(Type consumerType, Type[] consumerTypeDefinition)
     {
-        IEnumerable<Type> interfaces = consumerType
+        var interfaces = consumerType
             .GetInterfaces()
             .Where(i => i.IsGenericType)
             .Where(t => consumerTypeDefinition.Any(n => t.GetGenericTypeDefinition() == n));
@@ -52,7 +47,7 @@ static class TypeExtension
         return child.GetInterfaces()
             .Any(childInterface =>
             {
-                Type currentInterface = childInterface.IsGenericType
+                var currentInterface = childInterface.IsGenericType
                     ? childInterface.GetGenericTypeDefinition()
                     : childInterface;
 

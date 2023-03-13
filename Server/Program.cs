@@ -11,6 +11,8 @@ using Server.Core;
 using System.IO;
 using Server.Tools.MessageMapping;
 using Server.Authentication;
+using Share;
+using WebCommandsList = Server.HttpServer.WebCommandsList;
 
 namespace Server
 {

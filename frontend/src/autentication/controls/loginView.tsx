@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React, { useRef } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
-import { useService } from "../services/useService"
+import { useService } from "../../core/useService"
 import { observer } from "mobx-react-lite";
 
 import {

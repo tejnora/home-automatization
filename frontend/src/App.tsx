@@ -1,8 +1,8 @@
 import { CssBaseline } from "@mui/material";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { HomeView } from "./pages/homeView";
-import { LoginView } from "./pages/loginView";
-import { useService } from './services/useService';
+import { LoginView } from "./autentication/controls/loginView";
+import { useService } from './core/useService';
 import { useObserver } from "mobx-react-lite";
 import {  ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css';

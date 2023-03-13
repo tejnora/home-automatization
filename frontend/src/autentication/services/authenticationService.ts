@@ -19,7 +19,7 @@ export default class AuthenticationService {
     async login(username: string, password: string): Promise<boolean> {
         if (this.logged) return this.logged;
         let response = await this.client.login(username, password);
-        this.logged = response.Result == ResponseStatus.Success;
+        this.logged = response.Result === ResponseStatus.Success;
         if (this.logged) {
             this.userName = username;
             setSessionId(response.SessionId);
@@ -30,7 +30,7 @@ export default class AuthenticationService {
     async tryPernamentLogin(token: string): Promise<boolean> {
         if (this.logged) return this.logged;
         let response = await this.client.pernamentLogin(token);
-        this.logged = response.Result == ResponseStatus.Success;
+        this.logged = response.Result === ResponseStatus.Success;
         if (this.logged) {
             this.userName = response.UserName;
             setSessionId(response.SessionId);

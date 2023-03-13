@@ -5,7 +5,7 @@ namespace Server.Door;
 
 public class DoorCommandHandler
     : Define.IConsumer<UpdateDoorSettingsCommand, GeneralResponses>
-        , Define.IConsumer<OpenDoorCommand, GeneralResponses>
+    , Define.IConsumer<OpenDoorCommand, GeneralResponses>
 {
     readonly DoorMqttClient _mqttClient;
 

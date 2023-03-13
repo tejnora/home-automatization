@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BTDB\BTDB\BTDB.csproj" />
+    <ProjectReference Include="..\Share\Share.csproj" />
   </ItemGroup>
 
   <ItemGroup>

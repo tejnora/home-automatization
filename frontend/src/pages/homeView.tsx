@@ -27,7 +27,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
 import { observer } from "mobx-react-lite";
-import { useService } from "../services/useService"
+import { useService } from "../core/useService"
 
 const settingItems = ['Profile', 'Logout'];
 const menuItems = [

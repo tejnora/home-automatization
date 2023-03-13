@@ -4,8 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter } from "react-router-dom";
-import { ServicesProvider } from "./services/serviceProvider"
-import { ApplicationServices } from "./services/applicationServices"
+import { ServicesProvider } from "./core/serviceProvider"
+import { ApplicationServices } from "./applicationServices"
 
 const services = new ApplicationServices();
 
