@@ -6,8 +6,8 @@ class Program
     {
         args = new[]
         {
-            "", @"c:\_Data\Repos\home-automatization\Server\bin\Debug\net6.0-windows\Server.dll",
-            "c:\\_Data\\Repos\\home-automatization\\Server\\bin\\Debug\\net6.0-windows\\Server.ts"
+            "", @"c:/_Data/Repos/home-automatization\Server/bin/Debug/net6.0-windows/Server.dll",
+            "c:/_Data/Repos/home-automatization/frontend/src"
         };
         if (args.Length != 3)
         {

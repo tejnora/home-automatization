@@ -14,7 +14,8 @@ class ApiGenerator
 
     public ApiGenerator(string rootPath, ServiceData service)
     {
-        _rootPath = rootPath;
+        var name = service.Name.ToLowerInvariant();
+        _rootPath = Path.Combine(rootPath, name, "services",$"{name}Api.ts");
         _service = service;
     }
     public void GenerateService()
@@ -32,10 +33,12 @@ class ApiGenerator
         EmitServiceEndClass();
         EmitEmptyLine();
         EmitServiceExport();
+        Directory.CreateDirectory(Path.GetDirectoryName(_rootPath));
         File.WriteAllText(_rootPath, _outputCode.ToString());
     }
     void EmitImports()
     {
+        _outputCode.AppendLine("//Whole file is generated");
         _outputCode.AppendLine("import { IApiClient, apiClient } from '../../core/api/apiClient';");
         _outputCode.AppendLine("import { IResponseBase } from \"../../core/api/responseBase\"");
     }
