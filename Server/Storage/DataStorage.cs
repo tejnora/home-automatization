@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using BTDB.IOC;
+using BTDB.KVDBLayer;
+using BTDB.ODBLayer;
 using Serilog;
 using Server.Core;
 using Server.Tools;
@@ -12,8 +14,9 @@ using Server.Tools.MessageMapping;
 namespace Server.Storage;
 
 public class DataStorage
-    : IRestApi 
+    : IRestApi
     , IDataStorage
+    , IDisposable
 {
 
     readonly AsyncSemaphore _writeLock = new AsyncSemaphore(1);
@@ -22,10 +25,17 @@ public class DataStorage
     readonly Dictionary<Type, object> _queryObjectsCache = new Dictionary<Type, object>();
     readonly Dictionary<Type, object> _commandObjectsCache = new Dictionary<Type, object>();
     readonly object _objectsCacheLock = new object();
+    readonly IFileCollection _fileCollection;
     readonly IContainer _container;
+    public IObjectDB Database { get; }
 
-    public DataStorage(IContainer container)
+    public DataStorage(IFileCollection fileCollection, IContainer container)
     {
+        _fileCollection = fileCollection;
+        var databaseKeyValueTree = new BTreeKeyValueDB(_fileCollection);
+        Database = new ObjectDB();
+        Database.Open(databaseKeyValueTree, true);
+
         _container = container;
         _queryMapInfo = AssemblyScaner.GetCommandHandlerMap(h =>
         {
@@ -38,6 +48,16 @@ public class DataStorage
             h.ClassInterfaces = new[] { typeof(Define.ICommand) };
             h.GenericDefs = new[] { typeof(Define.IConsumer<>), typeof(Define.IConsumer<,>) };
         });
+        Command(new CommandContextBase(null), new InitCommand());
+    }
+
+    public void Dispose()
+    {
+        _writeLock.WaitAsync().ContinueWith(_ =>
+        {
+            Database?.Dispose();
+            _fileCollection?.Dispose();
+        }).Wait();
     }
 
     public Task<List<Define.IResponse>> Command(ICommandContext commandContext, Define.ICommand commnad)
@@ -51,6 +71,7 @@ public class DataStorage
         {
             try
             {
+                commandContext.Transaction = Database.StartTransaction();
                 var results = new List<Define.IResponse>();
                 foreach (var consumerType in consumerTypes)
                 {
@@ -69,6 +90,7 @@ public class DataStorage
                     if (result != null) results.Add((Define.IResponse)result);
                 }
                 source.SetResult(results);
+                commandContext.Transaction.Commit();
             }
             catch (Exception e)
             {
@@ -76,6 +98,8 @@ public class DataStorage
             }
             finally
             {
+                commandContext.Transaction.Dispose();
+                commandContext.Transaction = null;
                 _writeLock.Release();
             }
         }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);

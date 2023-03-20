@@ -11,7 +11,6 @@ using Server.Core;
 using System.IO;
 using Server.Tools.MessageMapping;
 using Server.Authentication;
-using Share;
 using WebCommandsList = Server.HttpServer.WebCommandsList;
 
 namespace Server
@@ -24,6 +23,10 @@ namespace Server
             NameAndVersionReporter.Print();
             UnhandledExceptionHandler.AttachHandlers();
             var options = InitServerOptions();
+            if (!Directory.Exists(options.DatabaseCollectionPath))
+            {
+                Directory.CreateDirectory(options.DatabaseCollectionPath);
+            }
             var builder = new ContainerBuilder();
             builder.RegisterType<HttpServer.HttpServer>().As<IHttpServer>().SingleInstance();
             builder.RegisterInstance(options).As<ServerOptions>();

@@ -32,3 +32,4 @@ MqttDotNet
 *.db
 BTDB
 .vs/
+Tools/ApiGenerator/run.bat

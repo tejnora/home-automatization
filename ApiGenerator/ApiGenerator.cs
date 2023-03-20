@@ -113,7 +113,7 @@ class ApiGenerator
 
     static string GetFunctionName(MemberInfo type)
     {
-        var name = type.Name;
+        var name = ToLowerCase(type.Name);
         if (name.EndsWith("Command"))
         {
             return name[..^7];

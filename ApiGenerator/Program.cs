@@ -4,22 +4,17 @@ class Program
 {
     static void Main(string[] args)
     {
-        args = new[]
-        {
-            "", @"c:/_Data/Repos/home-automatization\Server/bin/Debug/net6.0-windows/Server.dll",
-            "c:/_Data/Repos/home-automatization/frontend/src"
-        };
-        if (args.Length != 3)
+        if (args.Length != 2)
         {
             Console.Write("Generator has invalid params.");
         }
         try
         {
             var scanner = new AssemblyScanner();
-            scanner.Init(args[1]);
+            scanner.Init(args[0]);
             foreach (var service in scanner.Services)
             {
-                var generator = new ApiGenerator(args[2], service.Value);
+                var generator = new ApiGenerator(args[1], service.Value);
                 generator.GenerateService();
             }
 
@@ -29,6 +24,7 @@ class Program
             Console.WriteLine($"Generator failed:{e}");
             Environment.Exit(1);
         }
+        Console.WriteLine("The output was generated successfully.");
         Environment.Exit(0);
     }
 }

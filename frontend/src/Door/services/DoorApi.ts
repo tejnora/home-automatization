@@ -8,9 +8,9 @@ export interface IDoorSettingResponse extends IResponseBase {
 }
 
 export interface IDoorClient {
-    DoorSettings(): Promise<IDoorSettingResponse>;
-    OpenDoor(): Promise<IResponseBase>;
-    UpdateDoorSettings(enable: boolean, password: string,): Promise<IResponseBase>;
+    doorSettings(): Promise<IDoorSettingResponse>;
+    openDoor(): Promise<IResponseBase>;
+    updateDoorSettings(enable: boolean, password: string,): Promise<IResponseBase>;
 }
 
 class DoorClient implements IDoorClient {
@@ -20,15 +20,15 @@ class DoorClient implements IDoorClient {
        this.profileApiClient = apiClient;
     }
 
-    async DoorSettings(): Promise<IDoorSettingResponse>{
+    async doorSettings(): Promise<IDoorSettingResponse>{
         return this.profileApiClient.post<IDoorSettingResponse>("api/door/DoorSettingsQuery",{});
     }
 
-    async OpenDoor(): Promise<IResponseBase>{
+    async openDoor(): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/door/OpenDoorCommand",{});
     }
 
-    async UpdateDoorSettings(enable: boolean, password: string,): Promise<IResponseBase>{
+    async updateDoorSettings(enable: boolean, password: string,): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/door/UpdateDoorSettingsCommand",{Enable:enable,Password:password});
     }
 
