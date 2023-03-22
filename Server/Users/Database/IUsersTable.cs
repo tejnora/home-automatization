@@ -6,8 +6,8 @@ public interface IUsersTable : IRelation<User>
 {
     void Insert(User person);
     bool RemoveById(string name);
-    User FindById(string id);
-    bool UpdateById(string id, User user);
+    User FindById(string name);
+//    bool UpdateById(string name, User user);
     
-    bool Update(User user);
+    void Update(User user);
 }

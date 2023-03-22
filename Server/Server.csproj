@@ -21,8 +21,10 @@
 
   <ItemGroup>
     <Folder Include="Authentication\Queries\" />
-    <Folder Include="Users\Queries\" />
-    <Folder Include="Users\Responses\" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="$(SolutionDir)\Tools\ApiGenerator\ApiGenerator.exe $(SolutionDir)\Server\bin\Debug\net6.0-windows\Server.dll $(SolutionDir)\home-automatization\frontend\src\" />
+  </Target>
 
 </Project>

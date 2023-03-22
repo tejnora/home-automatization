@@ -107,9 +107,7 @@ namespace Server
             finally
             {
                 ((IDisposable)dataStorage).Dispose();
-                ((IDisposable)dateServer).Dispose();
             }
-
         }
     }
 }

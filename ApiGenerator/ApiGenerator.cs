@@ -159,12 +159,16 @@ class ApiGenerator
                 return "Date";
             case TypeCode.String:
                 return "string";
-            default:
+            case TypeCode.Object:
             {
-                var code = Type.GetTypeCode(type);
-                throw new ArgumentOutOfRangeException($"Type {code} is not supported.");
-            }
+                if (type.GetGenericTypeDefinition() == typeof(IList<>))
+                {
+                    return $"Array<{TypeToString(type.GenericTypeArguments[0])}>";
+                }
+            } break;
         }
+        var code = Type.GetTypeCode(type);
+        throw new ArgumentOutOfRangeException($"Type {code} is not supported.");
     }
 
     static string GetCallApiArguments(IEnumerable<PropertyInfo> values)

@@ -27,7 +27,7 @@ namespace Server.Authentication
             if (!string.IsNullOrEmpty(user.PermanentSessionId))
             {
                 user.PermanentSessionId = "";
-                table.UpdateById(command.User, user);
+                table.Update(user);
             }
             _sessionManager.RemoveSession(context.SessionId);
             return GeneralResponses.Success;
@@ -44,7 +44,7 @@ namespace Server.Authentication
             if (command.RememberMe)
             {
                 response.PermanentSessionId = PasswordHasher.GeneratePermanentSessionId();
-                table.UpdateById(command.UserName, user);
+                table.Update(user);
             }
             return response;
         }

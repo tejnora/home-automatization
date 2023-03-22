@@ -15,8 +15,6 @@ public class CommandContextBase : ICommandContext
 
     public T Table<T>(string tableName) where T : class, IRelation
     {
-        var creator = Transaction.InitRelation<T>("Users");
-        var personTable = creator(Transaction);
-        return personTable;
+        return Transaction.GetRelation<T>();
     }
 }

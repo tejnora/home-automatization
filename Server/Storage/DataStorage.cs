@@ -114,6 +114,7 @@ public class DataStorage
             {
                 throw new ArgumentException($"Handler for query {query.GetType()} does not exist.");
             }
+
             var consumerType = consumerTypes[0];
             object instance;
             MethodInfo consume;
@@ -130,14 +131,21 @@ public class DataStorage
             {
                 throw new ArgumentException($"Consume method for command {query.GetType().Name} does not exist.");
             }
+
             try
             {
+                queryContext.Transaction = Database.StartReadOnlyTransaction();
                 return (Define.IResponse)consume.Invoke(instance, new object[] { queryContext, query });
             }
             catch (Exception e)
             {
                 Log.Error(e.ToString());
                 return null;
+            }
+            finally
+            {
+                queryContext.Transaction.Dispose();
+                queryContext.Transaction = null;
             }
         }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
     }
