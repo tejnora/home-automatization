@@ -1,6 +1,5 @@
 ﻿using BTDB.ODBLayer;
 using Microsoft.AspNetCore.Http;
-using Server.Users.Database;
 
 namespace Server.Core;
 
@@ -13,7 +12,7 @@ public class CommandContextBase : ICommandContext
     public string SessionId { get; }
     public IObjectDBTransaction Transaction { get; set; }
 
-    public T Table<T>(string tableName) where T : class, IRelation
+    public T Table<T>() where T : class, IRelation
     {
         return Transaction.GetRelation<T>();
     }

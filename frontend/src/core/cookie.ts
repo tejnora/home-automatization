@@ -3,17 +3,13 @@ let resolveDomain = (): string => {
   return hostname;
 };
 
-export function setCookie(name: string, value: string, domain: string) {
+export function setCookie(name: string, value: string, domain?: string) {
+  if (domain === undefined) {
+    domain = resolveDomain();
+  }
   var expireTime = new Date();
   expireTime.setFullYear(new Date().getFullYear() + 1);
-  document.cookie =
-    name +
-    "=" +
-    encodeURIComponent(value) +
-    "; path=/; domain = " +
-    domain +
-    ";expires=" +
-    expireTime;
+  document.cookie = `${name}=${encodeURIComponent(value)};path=/;domain=${domain};expires=${expireTime}`;
 }
 
 export function getCookie(name: string) {
@@ -28,12 +24,11 @@ export function getCookie(name: string) {
   document.cookie = ca.join(";");
 }
 
-export function usetCookie(name: string, domain: string) {
-  document.cookie =
-    name +
-    "=; path=/; domain = " +
-    domain +
-    ";expires=Thu, 01 Jan 1970 00:00:00 UTC";
+export function usetCookie(name: string, domain?: string) {
+  if (domain === undefined) {
+    domain = resolveDomain();
+  }
+  document.cookie = `${name}=; path=/; domain = ${domain};expires=Thu, 01 Jan 1970 00:00:00 UTC`;
 }
 
 export let getLanguage = (): string => {
@@ -49,31 +44,5 @@ export let getLanguage = (): string => {
 
 export let setLanguage = (lang: string) => {
   setCookie("gc-common-lang", lang, resolveDomain());
-};
-
-export let getSessionId = () => {
-  let value = getCookie("session-id");
-  return value;
-};
-
-export let setSessionId = (sessingId: string) => {
-  setCookie("session-id", sessingId, resolveDomain());
-};
-
-export let unsetSessionId = () => {
-  usetCookie("session-id", resolveDomain());
-};
-
-export let getPernamentSessionId = () => {
-  let value = getCookie("pernament-session-id");
-  return value;
-};
-
-export let setPernametSessionId = (sessingId: string) => {
-  setCookie("pernament-session-id", sessingId, resolveDomain());
-};
-
-export let unsetPernametSessionId = () => {
-  usetCookie("pernament-session-id", resolveDomain());
 };
 

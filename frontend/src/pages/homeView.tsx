@@ -28,8 +28,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
 import { observer } from "mobx-react-lite";
 import { useService } from "../core/useService"
+import ChangePasswordDialog from "../users/controls/userChangePasswordDialog"
 
-const settingItems = ['Profile', 'Logout'];
+
+const settingItems = ['Change password', 'Logout'];
 const menuItems = [
     {
         name: "Dashboard",
@@ -110,7 +112,7 @@ function MainMenu() {
             {
                 menuItems.map(element => {
                     return (
-                        <ListItemButton>
+                        <ListItemButton key={element.name}>
                             <ListItemIcon>
                                 {element.icon}
                             </ListItemIcon>
@@ -125,6 +127,7 @@ function MainMenu() {
 function UserMenu() {
     const authentification = useService().Authentification;
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+    const [changePssowordDialog, setChangePssowordDialog] = useState(false);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
@@ -135,42 +138,48 @@ function UserMenu() {
     };
 
     function handleMenuClick(name: string) {
-        if (name == "Logout") {
+        if (name === "Logout") {
             authentification.logout();
+        }
+        else if (name === "Change password") {
+            setChangePssowordDialog(true);
         }
         setAnchorElUser(null);
     }
 
     return (
-        <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar />
-                </IconButton>
-            </Tooltip>
-            <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-            >
-                {settingItems.map((setting) => (
-                    <MenuItem onClick={() => handleMenuClick(setting)}>
-                        <Typography textAlign="center">{setting}</Typography>
-                    </MenuItem>
-                ))}
-            </Menu>
-        </Box>
+        <div>
+            <ChangePasswordDialog openDialog={changePssowordDialog} setOpenDialog={setChangePssowordDialog} />
+            <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open settings">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                        <Avatar />
+                    </IconButton>
+                </Tooltip>
+                <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                >
+                    {settingItems.map((setting) => (
+                        <MenuItem onClick={() => handleMenuClick(setting)} key={setting}>
+                            <Typography textAlign="center">{setting}</Typography>
+                        </MenuItem>
+                    ))}
+                </Menu>
+            </Box>
+        </div>
     )
 }
 

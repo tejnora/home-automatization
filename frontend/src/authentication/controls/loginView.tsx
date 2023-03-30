@@ -1,12 +1,11 @@
 import { useState } from "react";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useService } from "../../core/useService"
 import { observer } from "mobx-react-lite";
 
 import {
     Container,
-    Link,
     Box,
     FormControl,
     TextField,
@@ -39,28 +38,39 @@ const ContentStyle = styled("div")({
 });
 
 export const LoginView = observer(() => {
-    const authentification = useService().Authentification;
+    const auth = useService().Authentification;
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
     const userNameRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
 
+    useEffect(() => {
+        if (auth.logged || auth.logging) return;
+        auth.tryPernamentLogin().then(redirect => {
+            if (!redirect) return;
+            const from = location.state?.from?.pathname || "/";
+            navigate(from, { replace: true });
+        })
+    })
+
     async function handleSubmit(e: React.SyntheticEvent) {
         let userName = userNameRef.current?.value;
         let password = passwordRef.current?.value;
-        if(!(userName && password))return;
-        var res = await authentification.login(userName, password)
+        if (!(userName && password)) return;
+        var res = await auth.login(userName, password, rememberMe)
         if (res) {
             navigate(from, { replace: true });
         }
     }
+
     return (
         <RootStyle>
             <Container maxWidth="sm">
                 <ContentStyle>
-                    <FormControl>
+                    <FormControl disabled={auth.logging} >
                         <Box
                             sx={{
                                 display: "flex",
@@ -74,6 +84,7 @@ export const LoginView = observer(() => {
                                 type="email"
                                 label="User name"
                                 inputRef={userNameRef}
+                                disabled={auth.logging}
                             />
                             <TextField
                                 fullWidth
@@ -88,8 +99,9 @@ export const LoginView = observer(() => {
                                                 {showPassword ? (<Icon icon="eva:eye-fill" />) : (<Icon icon="eva:eye-off-fill" />)}
                                             </IconButton>
                                         </InputAdornment>
-                                    ),
+                                    )
                                 }}
+                                disabled={auth.logging}
                             />
                         </Box>
                         <Box>
@@ -100,17 +112,9 @@ export const LoginView = observer(() => {
                                 sx={{ my: 2 }}
                             >
                                 <FormControlLabel
-                                    control={<Checkbox />}
+                                    control={<Checkbox value={rememberMe} onClick={() => setRememberMe(!rememberMe)} />}
                                     label="Remember me"
                                 />
-                                <Link
-                                    component={RouterLink}
-                                    variant="subtitle2"
-                                    to="#"
-                                    underline="hover"
-                                >
-                                    Forgot password?
-                                </Link>
                             </Stack>
                             <Box textAlign='center'><Button type="submit" variant="contained" onClick={handleSubmit}>Login</Button></Box>
                         </Box>

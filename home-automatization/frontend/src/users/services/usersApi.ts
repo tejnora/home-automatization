@@ -11,6 +11,7 @@ export interface IUsersClient {
     createUser(name: string, password: string,): Promise<IResponseBase>;
     removeUser(name: string,): Promise<IResponseBase>;
     updateUser(name: string, password: string,): Promise<IResponseBase>;
+    userChangePassword(user: string, newPassword: string, originPassword: string,): Promise<IResponseBase>;
 }
 
 class UsersClient implements IUsersClient {
@@ -34,6 +35,10 @@ class UsersClient implements IUsersClient {
 
     async updateUser(name: string, password: string,): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/users/UpdateUserCommand",{Name:name,Password:password});
+    }
+
+    async userChangePassword(user: string, newPassword: string, originPassword: string,): Promise<IResponseBase>{
+        return this.profileApiClient.post<IResponseBase>("api/users/UserChangePasswordCommand",{User:user,NewPassword:newPassword,OriginPassword:originPassword});
     }
 
 }

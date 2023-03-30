@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import AuthenticationService from "./autentication/services/authenticationService"
+import AuthenticationService from "./authentication/services/authenticationService"
 
 export class ApplicationServices {
     Authentification: AuthenticationService;
