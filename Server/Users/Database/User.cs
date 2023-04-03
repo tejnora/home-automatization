@@ -9,4 +9,5 @@ public class User
     public string Password { get; set; }
     public byte[] Salt { get; set; }
     public string PermanentSessionId { get; set; }
+    public bool Enabled { get; set; }
 }

@@ -2,16 +2,21 @@
 import { IApiClient, apiClient } from '../../core/api/apiClient';
 import { IResponseBase } from "../../core/api/responseBase"
 
+export interface IUserListResponse{
+   Name: string;
+   Enabled: boolean;
+}
+
 export interface IUsersListResponse extends IResponseBase {
-   Users: Array<string>;
+   Users: Array<IUserListResponse>;
 }
 
 export interface IUsersClient {
     usersList(): Promise<IUsersListResponse>;
-    createUser(name: string, password: string,): Promise<IResponseBase>;
-    removeUser(name: string,): Promise<IResponseBase>;
-    updateUser(name: string, password: string,): Promise<IResponseBase>;
-    userChangePassword(user: string, newPassword: string, originPassword: string,): Promise<IResponseBase>;
+    createUser(name: string, password: string): Promise<IResponseBase>;
+    removeUser(name: string): Promise<IResponseBase>;
+    updateUser(name: string, password: string, enabled: boolean): Promise<IResponseBase>;
+    userChangePassword(user: string, newPassword: string, originPassword: string): Promise<IResponseBase>;
 }
 
 class UsersClient implements IUsersClient {
@@ -25,19 +30,19 @@ class UsersClient implements IUsersClient {
         return this.profileApiClient.post<IUsersListResponse>("api/users/UsersListQuery",{});
     }
 
-    async createUser(name: string, password: string,): Promise<IResponseBase>{
+    async createUser(name: string, password: string): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/users/CreateUserCommand",{Name:name,Password:password});
     }
 
-    async removeUser(name: string,): Promise<IResponseBase>{
+    async removeUser(name: string): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/users/RemoveUserCommand",{Name:name});
     }
 
-    async updateUser(name: string, password: string,): Promise<IResponseBase>{
-        return this.profileApiClient.post<IResponseBase>("api/users/UpdateUserCommand",{Name:name,Password:password});
+    async updateUser(name: string, password: string, enabled: boolean): Promise<IResponseBase>{
+        return this.profileApiClient.post<IResponseBase>("api/users/UpdateUserCommand",{Name:name,Password:password,Enabled:enabled});
     }
 
-    async userChangePassword(user: string, newPassword: string, originPassword: string,): Promise<IResponseBase>{
+    async userChangePassword(user: string, newPassword: string, originPassword: string): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/users/UserChangePasswordCommand",{User:user,NewPassword:newPassword,OriginPassword:originPassword});
     }
 

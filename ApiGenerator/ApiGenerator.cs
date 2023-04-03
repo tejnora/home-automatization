@@ -8,14 +8,16 @@ class ApiGenerator
     readonly string _rootPath;
     readonly ServiceData _service;
     StringBuilder _outputCode = new();
+    List<StringBuilder> _outputCodeStack = new();
     StringBuilder _methodsCode = new();
     StringBuilder _IMethodCode = new();
     HashSet<Type> _interfaces = new();
+    Dictionary<Type, string> _exportedObjects = new();
 
     public ApiGenerator(string rootPath, ServiceData service)
     {
         var name = service.Name.ToLowerInvariant();
-        _rootPath = Path.Combine(rootPath, name, "services",$"{name}Api.ts");
+        _rootPath = Path.Combine(rootPath, name, "services", $"{name}Api.ts");
         _service = service;
     }
     public void GenerateService()
@@ -42,19 +44,52 @@ class ApiGenerator
         _outputCode.AppendLine("import { IApiClient, apiClient } from '../../core/api/apiClient';");
         _outputCode.AppendLine("import { IResponseBase } from \"../../core/api/responseBase\"");
     }
+
+    void PushOutputCode()
+    {
+        _outputCodeStack.Add(_outputCode);
+        _outputCode = new StringBuilder();
+    }
+
+    void PopOutputCode()
+    {
+        _outputCodeStack[0].Append(_outputCode);
+        _outputCode = _outputCodeStack[^1];
+        _outputCodeStack.RemoveAt(_outputCodeStack.Count-1);
+    }
     void EmitResponseInterfaces()
     {
         foreach (var type in _interfaces)
         {
+            PushOutputCode();
             _outputCode.AppendLine($"export interface {GetResponseInterface(type)} extends IResponseBase {{");
             foreach (var param in GetFunctionParams(type))
             {
-                if(param.Name== "Result") continue;
+                if (param.Name == "Result") continue;
                 _outputCode.AppendLine($"   {param.Name}: {TypeToString(param.PropertyType)};");
             }
             _outputCode.AppendLine("}");
             EmitEmptyLine();
+            PopOutputCode();
         }
+    }
+
+    string EmitResponseObject(Type type)
+    {
+        if (_exportedObjects.TryGetValue(type, out var typeName))
+            return typeName;
+        PushOutputCode();
+        typeName = GetResponseInterface(type);
+        _outputCode.AppendLine($"export interface {typeName}{{");
+        foreach (var param in GetFunctionParams(type))
+        {
+            _outputCode.AppendLine($"   {param.Name}: {TypeToString(param.PropertyType)};");
+        }
+        _outputCode.AppendLine("}");
+        EmitEmptyLine();
+        PopOutputCode();
+        _exportedObjects.Add(type, typeName);
+        return typeName;
     }
 
     void EmitServiceBeginClass()
@@ -81,7 +116,7 @@ class ApiGenerator
             var outputType = type.Item2;
             var fncParams = GetFunctionParams(inputType);
             var responseInterface = GetResponseInterface(outputType);
-            var methodWithParamsDef= $"{GetFunctionName(inputType)}({GetFunctionArguments(fncParams)}): Promise<{responseInterface}>";
+            var methodWithParamsDef = $"{GetFunctionName(inputType)}({GetFunctionArguments(fncParams)}): Promise<{responseInterface}>";
             if (responseInterface != "IResponseBase")
             {
                 _interfaces.Add(outputType);
@@ -126,7 +161,7 @@ class ApiGenerator
         return type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
     }
 
-    static string GetFunctionArguments(IEnumerable<PropertyInfo> values)
+    string GetFunctionArguments(IEnumerable<PropertyInfo> values)
     {
         if (!values.Any()) return "";
         var result = new StringBuilder();
@@ -134,10 +169,10 @@ class ApiGenerator
         {
             result.Append($"{ToLowerCase(value.Name)}: {TypeToString(value.PropertyType)}, ");
         }
-        return result.ToString(0, result.Length - 1);
+        return result.ToString(0, result.Length - 2);
     }
 
-    static string TypeToString(Type type)
+    string TypeToString(Type type)
     {
         switch (Type.GetTypeCode(type))
         {
@@ -160,12 +195,20 @@ class ApiGenerator
             case TypeCode.String:
                 return "string";
             case TypeCode.Object:
-            {
-                if (type.GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    return $"Array<{TypeToString(type.GenericTypeArguments[0])}>";
+                    if (type.IsConstructedGenericType)
+                    {
+                        if (type.GetGenericTypeDefinition() == typeof(IList<>))
+                        {
+                            return $"Array<{TypeToString(type.GenericTypeArguments[0])}>";
+                        }
+                    }
+                    else
+                    {
+                        return EmitResponseObject(type);
+                    }
                 }
-            } break;
+                break;
         }
         var code = Type.GetTypeCode(type);
         throw new ArgumentOutOfRangeException($"Type {code} is not supported.");

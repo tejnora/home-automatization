@@ -21,7 +21,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginView />} />
             <Route
-              path="/"
+              path="*"
               element={auth.logged ? (<HomeView />) : (<Navigate to="/login" state={{ from: location }} replace />)}
             />
           </Routes>

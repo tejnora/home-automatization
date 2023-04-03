@@ -12,6 +12,6 @@ public class UsersQueryHandler
     public UsersListResponse Consume(IQueryContext consumeContext, UsersListQuery request)
     {
         var users = consumeContext.Table<IUsersTable>("Users");
-        return new UsersListResponse { Users = users.Select((n) => n.Name).ToList() };
+        return new UsersListResponse { Users = users.Select((n) => new UserListResponse { Name = n.Name, Enabled = n.Enabled }).ToList() };
     }
 }

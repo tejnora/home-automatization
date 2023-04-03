@@ -1,5 +1,4 @@
 ﻿using Server.Core;
-using Server.HttpServer;
 using Share;
 
 namespace Server.Authentication.Commands;

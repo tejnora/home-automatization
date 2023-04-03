@@ -24,7 +24,7 @@ public class UsersCommandHandler
     public GeneralResponses Consume(ICommandContext context, UpdateUserCommand command)
     {
         var password = PasswordHasher.HashPassword(command.Password, out var salt);
-        context.Table<IUsersTable>().Update(new User { Name = command.Name, Password = password, Salt = salt });
+        context.Table<IUsersTable>().Update(new User { Name = command.Name, Password = password, Salt = salt, Enabled = command.Enabled });
         return GeneralResponses.Success;
     }
 
@@ -44,7 +44,7 @@ public class UsersCommandHandler
     public GeneralResponses Consume(ICommandContext context, UserChangePasswordCommand command)
     {
         var usersTable = context.Table<IUsersTable>();
-        var user = usersTable.FindById(command.User);
+        var user = usersTable.FindByIdOrDefault(command.User);
         if (user == null || !PasswordHasher.VerifyPassword(command.OriginPassword, user.Password, user.Salt)) return GeneralResponses.Failed;
         user.Password = PasswordHasher.HashPassword(command.NewPassword, out var salt);
         user.Salt = salt;

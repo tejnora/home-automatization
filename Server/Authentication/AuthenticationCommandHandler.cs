@@ -21,7 +21,7 @@ namespace Server.Authentication
         public GeneralResponses Consume(ICommandContext context, LogoutCommand command)
         {
             var table = context.Table<IUsersTable>();
-            var user = table.FindById(command.User);
+            var user = table.FindByIdOrDefault(command.User);
             if (user == null)
                 return GeneralResponses.Failed;
             if (!string.IsNullOrEmpty(user.PermanentSessionId))
@@ -36,7 +36,7 @@ namespace Server.Authentication
         public LoginResponse Consume(ICommandContext context, LoginCommand command)
         {
             var table = context.Table<IUsersTable>();
-            var user = table.FindById(command.UserName);
+            var user = table.FindByIdOrDefault(command.UserName);
             if (user == null || !PasswordHasher.VerifyPassword(command.Password, user.Password, user.Salt))
                 return new LoginResponse { Result = ResponseType.IncorrectLoginData };
             var session = _sessionManager.CreateSession(command.UserName);
@@ -52,7 +52,7 @@ namespace Server.Authentication
         public PermanentLoginResponse Consume(ICommandContext context, PermanentLoginCommand command)
         {
             var table = context.Table<IUsersTable>();
-            var user = table.FindById(command.Name);
+            var user = table.FindByIdOrDefault(command.Name);
             if (user == null || user.PermanentSessionId != command.Token)
                 return new PermanentLoginResponse { Result = ResponseType.IncorrectLoginData };
             var session = _sessionManager.CreateSession(user.Name);

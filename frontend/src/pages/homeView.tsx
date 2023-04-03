@@ -12,8 +12,8 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Grid,
-    Paper
+    Paper,
+    Grid
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
@@ -29,6 +29,8 @@ import Avatar from '@mui/material/Avatar';
 import { observer } from "mobx-react-lite";
 import { useService } from "../core/useService"
 import ChangePasswordDialog from "../users/controls/userChangePasswordDialog"
+import { useNavigate, Routes, Route } from "react-router-dom";
+import { UserView } from "../users/controls/userView"
 
 
 const settingItems = ['Change password', 'Logout'];
@@ -36,17 +38,20 @@ const menuItems = [
     {
         name: "Dashboard",
         link: "Dashboard",
-        icon: <DashboardIcon />
+        icon: <DashboardIcon />,
+        page: <Paper />
     },
     {
         name: "Doors",
         link: "Doors",
-        icon: <LayersIcon />
+        icon: <LayersIcon />,
+        page: <Paper />
     },
     {
         name: "Users",
         link: "Users",
-        icon: <PeopleIcon />
+        icon: <PeopleIcon />,
+        page: <UserView />
     }];
 
 const drawerWidth: number = 240;
@@ -107,12 +112,17 @@ function Copyright(props: any) {
 }
 
 function MainMenu() {
+    const navigate = useNavigate();
+
+    function HandleMenuClick(link: string) {
+        navigate(link, { replace: true });
+    }
     return (
         <React.Fragment>
             {
                 menuItems.map(element => {
                     return (
-                        <ListItemButton key={element.name}>
+                        <ListItemButton key={element.name} onClick={(e) => { HandleMenuClick(element.link); e.stopPropagation(); }}>
                             <ListItemIcon>
                                 {element.icon}
                             </ListItemIcon>
@@ -247,20 +257,15 @@ export const HomeView = observer(() => {
                     overflow: 'auto',
                 }}
             >
+                <Toolbar />
                 <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: 240,
-                                }}
-                            >
-                            </Paper>
-                        </Grid>
-                    </Grid>
+                    <Routes>
+                        {
+                            menuItems.map((n) => {
+                                return (<Route path={`/${n.link}`} element={n.page} />);
+                            })
+                        }
+                    </Routes>
                     <Copyright sx={{ pt: 4 }} />
                 </Container>
             </Box>

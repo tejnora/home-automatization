@@ -13,9 +13,9 @@ export interface IPermanentLoginResponse extends IResponseBase {
 }
 
 export interface IAuthenticationClient {
-    login(userName: string, password: string, rememberMe: boolean,): Promise<ILoginResponse>;
-    logout(user: string,): Promise<IResponseBase>;
-    permanentLogin(name: string, token: string,): Promise<IPermanentLoginResponse>;
+    login(userName: string, password: string, rememberMe: boolean): Promise<ILoginResponse>;
+    logout(user: string): Promise<IResponseBase>;
+    permanentLogin(name: string, token: string): Promise<IPermanentLoginResponse>;
 }
 
 class AuthenticationClient implements IAuthenticationClient {
@@ -25,15 +25,15 @@ class AuthenticationClient implements IAuthenticationClient {
        this.profileApiClient = apiClient;
     }
 
-    async login(userName: string, password: string, rememberMe: boolean,): Promise<ILoginResponse>{
+    async login(userName: string, password: string, rememberMe: boolean): Promise<ILoginResponse>{
         return this.profileApiClient.post<ILoginResponse>("api/authentication/LoginCommand",{UserName:userName,Password:password,RememberMe:rememberMe});
     }
 
-    async logout(user: string,): Promise<IResponseBase>{
+    async logout(user: string): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/authentication/LogoutCommand",{User:user});
     }
 
-    async permanentLogin(name: string, token: string,): Promise<IPermanentLoginResponse>{
+    async permanentLogin(name: string, token: string): Promise<IPermanentLoginResponse>{
         return this.profileApiClient.post<IPermanentLoginResponse>("api/authentication/PermanentLoginCommand",{Name:name,Token:token});
     }
 
