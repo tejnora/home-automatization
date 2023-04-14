@@ -129,6 +129,25 @@ class ApiGenerator
             _IMethodCode.AppendLine($"    {methodWithParamsDef};");
         }
 
+        foreach (var type in _service.GetFunction)
+        {
+            var inputType = type.Item1;
+            var outputType = type.Item2;
+            var fncParams = GetFunctionParams(inputType);
+            var responseInterface = GetResponseInterface(outputType);
+            var methodWithParamsDef = $"{GetFunctionName(inputType)}({GetFunctionArguments(fncParams)}): Promise<{responseInterface}>";
+            if (responseInterface != "IResponseBase")
+            {
+                _interfaces.Add(outputType);
+            }
+            _methodsCode.AppendLine($"    async {methodWithParamsDef}{{");
+            _methodsCode.AppendLine($"        return this.profileApiClient.get<{responseInterface}>(\"api/{_service.Name.ToLowerInvariant()}/{inputType.Name}\");");
+            _methodsCode.AppendLine("    }");
+            _methodsCode.AppendLine("");
+
+            _IMethodCode.AppendLine($"    {methodWithParamsDef};");
+        }
+
     }
 
     void EmitServiceExport()

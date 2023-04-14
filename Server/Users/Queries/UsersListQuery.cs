@@ -3,7 +3,7 @@ using Share;
 
 namespace Server.Users.Queries;
 
-[WebPost]
+[WebGet]
 public class UsersListQuery : Define.IRequest
 {
 }

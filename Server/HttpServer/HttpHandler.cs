@@ -146,8 +146,8 @@ public class HttpHandler
     {
         var jsonData = JsonSerializer.Serialize(data, JsonSerializerOptions);
         httpContext.Response.ContentType = "application/json;charset=utf8";
-        await httpContext.Response.Body.WriteAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(jsonData)));
         httpContext.Response.StatusCode = 200;
+        await httpContext.Response.Body.WriteAsync(new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(jsonData)));
     }
 
     void SetResponseHeaders(HttpResponse response, IEnumerable<string> requestPathFragments, bool allowCache = false)

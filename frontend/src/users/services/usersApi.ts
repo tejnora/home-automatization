@@ -12,11 +12,11 @@ export interface IUsersListResponse extends IResponseBase {
 }
 
 export interface IUsersClient {
-    usersList(): Promise<IUsersListResponse>;
     createUser(name: string, password: string): Promise<IResponseBase>;
     removeUser(name: string): Promise<IResponseBase>;
     updateUser(name: string, password: string, enabled: boolean): Promise<IResponseBase>;
     userChangePassword(user: string, newPassword: string, originPassword: string): Promise<IResponseBase>;
+    usersList(): Promise<IUsersListResponse>;
 }
 
 class UsersClient implements IUsersClient {
@@ -24,10 +24,6 @@ class UsersClient implements IUsersClient {
 
     constructor(profileApiClient: IApiClient) {
        this.profileApiClient = apiClient;
-    }
-
-    async usersList(): Promise<IUsersListResponse>{
-        return this.profileApiClient.post<IUsersListResponse>("api/users/UsersListQuery",{});
     }
 
     async createUser(name: string, password: string): Promise<IResponseBase>{
@@ -44,6 +40,10 @@ class UsersClient implements IUsersClient {
 
     async userChangePassword(user: string, newPassword: string, originPassword: string): Promise<IResponseBase>{
         return this.profileApiClient.post<IResponseBase>("api/users/UserChangePasswordCommand",{User:user,NewPassword:newPassword,OriginPassword:originPassword});
+    }
+
+    async usersList(): Promise<IUsersListResponse>{
+        return this.profileApiClient.get<IUsersListResponse>("api/users/UsersListQuery");
     }
 
 }
