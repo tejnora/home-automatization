@@ -27,7 +27,7 @@ public class UnixEpochDateTimeConverter : JsonConverter<DateTime>
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
     {
         var unixTime = Convert.ToInt64((value - s_epoch).TotalMilliseconds);
-
+        if (unixTime < 0) unixTime = 0;
         var formatted = FormattableString.Invariant($"/Date({unixTime})/");
         writer.WriteStringValue(formatted);
     }

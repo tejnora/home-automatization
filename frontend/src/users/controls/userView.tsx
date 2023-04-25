@@ -13,7 +13,8 @@ import {
   MuiEvent,
   GridEventListener,
   GridRowModel,
-  GridRenderEditCellParams
+  GridRenderEditCellParams,
+  GridValidRowModel
 } from '@mui/x-data-grid';
 import Title from "../../gui/title"
 import Button from '@mui/material/Button';
@@ -24,6 +25,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import { usersClient, IUserListResponse } from "../services/usersApi"
 import { suspend } from 'suspend-react'
+import CreateUserDialog from './createUserDialog';
 
 let idCounter = 0;
 
@@ -32,18 +34,31 @@ interface EditToolbarProps {
   setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void;
 }
 
+interface IRowData extends GridValidRowModel {
+  id: number;
+  name: string;
+  password?: string;
+  lastLogin: Date;
+  enabled: boolean;
+}
+
 function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel } = props;
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const handleClick = () => {
-    const id = idCounter++;
-    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
+    setOpenPasswordDialog(true);
   };
   return (
     <GridToolbarContainer>
+      <CreateUserDialog openDialog={openPasswordDialog} setOpenDialog={setOpenPasswordDialog} createUser={
+        (user: string, password: string) => {
+          const id = idCounter++;
+          setRows((oldRows) => [...oldRows, { id, name: user, password: password, isNew: true }]);
+          setRowModesModel((oldModel) => ({
+            ...oldModel,
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+          }));
+        }} />
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
         Add user
       </Button>
@@ -52,7 +67,7 @@ function EditToolbar(props: EditToolbarProps) {
 }
 
 const DataControlLazy = () => {
-  const [rows, setRows] = useState<GridRowsProp>([]);
+  const [rows, setRows] = useState<GridRowsProp<IRowData>>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [load, setLoad] = useState(true);
 
@@ -62,12 +77,11 @@ const DataControlLazy = () => {
       const res = await usersClient.usersList();
       return res.Users
     }, ['usersList']);
-    setRows(data.map<any>((item) => {
+    setRows(data.map<IRowData>((item) => {
       return {
         id: idCounter++,
         name: item.Name,
-        dateCreated: new Date(),
-        lastLogin: new Date(),
+        lastLogin: item.LastLogin,
         enabled: item.Enabled
       }
     }));
@@ -90,6 +104,9 @@ const DataControlLazy = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
+    const rowItem = rows.find((row) => row.id === id);
+    if (rowItem === undefined) return;
+    usersClient.removeUser(rowItem.name);
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -101,9 +118,15 @@ const DataControlLazy = () => {
     }
   };
 
-  const processRowUpdate = (newRow: GridRowModel) => {
+  const processRowUpdate = (newRow: IRowData) => {
     const updatedRow = { ...newRow, isNew: false };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    if (newRow.isNew) {
+      usersClient.createUser(newRow.name, newRow.password as string, newRow.enabled);
+    }
+    else {
+      usersClient.updateUser(newRow.name, newRow.enabled);
+    }
     return updatedRow;
   };
 
@@ -121,11 +144,20 @@ const DataControlLazy = () => {
         <Checkbox checked={params.value} disabled />
       ),
       renderEditCell: (params: GridRenderEditCellParams) => (
-        <Checkbox checked={params.value} onChange={() => params.value = !params.value} />
+        <Checkbox checked={params.value} onChange={
+          (e,value) => params.value = !params.value} />
       ),
     },
-    { field: 'name', headerName: 'Name', width: 250, editable: true },
-    { field: 'lastLogin', headerName: 'Last Login', type: 'dateTime', width: 220, editable: false, },
+    { field: 'name', headerName: 'Name', width: 250, editable: false },
+    {
+      field: 'lastLogin',
+      headerName: 'Last Login',
+      width: 220,
+      editable: false,
+      valueGetter: (params) => {
+        return params.row.lastLogin?.toString();
+      }
+    },
     {
       field: 'actions',
       type: 'actions',

@@ -16,15 +16,27 @@ public class UsersCommandHandler
 
     public GeneralResponses Consume(ICommandContext context, CreateUserCommand command)
     {
+        var usersTable = context.Table<IUsersTable>();
+        var user = usersTable.FindByIdOrDefault(command.Name);
+        if (user != null)
+        {
+            return GeneralResponses.Failed;
+        }
         var password = PasswordHasher.HashPassword(command.Password, out var salt);
-        context.Table<IUsersTable>().Insert(new User { Name = command.Name, Password = password, Salt = salt });
+        context.Table<IUsersTable>().Insert(new User { Name = command.Name, Password = password, Salt = salt, Enabled = command.Enabled});
         return GeneralResponses.Success;
     }
 
     public GeneralResponses Consume(ICommandContext context, UpdateUserCommand command)
     {
-        var password = PasswordHasher.HashPassword(command.Password, out var salt);
-        context.Table<IUsersTable>().Update(new User { Name = command.Name, Password = password, Salt = salt, Enabled = command.Enabled });
+        var usersTable = context.Table<IUsersTable>();
+        var user = usersTable.FindByIdOrDefault(command.Name);
+        if (user == null)
+        {
+            return GeneralResponses.Failed;
+        }
+        user.Enabled = command.Enabled;
+        context.Table<IUsersTable>().Update(user);
         return GeneralResponses.Success;
     }
 
@@ -37,7 +49,7 @@ public class UsersCommandHandler
     {
         if (context.Table<IUsersTable>().Count != 0)
             return GeneralResponses.Success;
-        Consume(context, new CreateUserCommand { Name = "admin", Password = "pass" });
+        Consume(context, new CreateUserCommand { Name = "admin", Password = "pass", Enabled = true });
         return GeneralResponses.Success;
     }
 

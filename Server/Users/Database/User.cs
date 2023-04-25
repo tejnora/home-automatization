@@ -1,4 +1,5 @@
 ﻿using BTDB.ODBLayer;
+using System;
 
 namespace Server.Users.Database;
 
@@ -10,4 +11,5 @@ public class User
     public byte[] Salt { get; set; }
     public string PermanentSessionId { get; set; }
     public bool Enabled { get; set; }
+    public DateTime LastLogin { get; init; }
 }
