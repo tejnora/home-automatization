@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import { Logger } from "../logger"
+import "../../extensions/stringExtenstions";
 
 export interface IApiClient {
   post<TResponse>(path: string, payload: any): Promise<TResponse>;
@@ -12,7 +13,7 @@ class ApiClient implements IApiClient {
   private client: AxiosInstance;
 
   protected createAxiosClient(): AxiosInstance {
-    return Axios.create({
+    const client= Axios.create({
       baseURL: /*AppConfig.baseURL*/"",
       responseType: 'json' as const,
       headers: {
@@ -20,10 +21,37 @@ class ApiClient implements IApiClient {
       },
       timeout: 10 * 1000,
     });
+    client.interceptors.response.use((originalResponse: any )=> {
+      this.handleDates(originalResponse.data)
+      return originalResponse;
+    });
+  return client;    
   }
+
+  private readonly isoDateFormat = /\/+Date\(([\d+-]+)\)\/+/;
+
+  private isIsoDateString(value: any): boolean {
+    return value && typeof value === "string" && this.isoDateFormat.test(value);
+  }
+  
+  private handleDates(body: any) {
+    if (body === null || body === undefined || typeof body !== "object")
+      return body;
+  
+    for (const key of Object.keys(body)) {
+      const value = body[key];
+      if (this.isIsoDateString(value)){ 
+        body[key] = (<string>value).toDateTime();
+      }
+      else if (typeof value === "object"){
+         this.handleDates(value);
+        }
+    }
+  }  
 
   constructor() {
     this.client = this.createAxiosClient();
+    
   }
 
   async post<TResponse>(path: string, payload: any): Promise<TResponse> {

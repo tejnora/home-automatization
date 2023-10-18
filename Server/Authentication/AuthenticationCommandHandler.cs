@@ -1,4 +1,5 @@
-﻿using Server.Authentication.Commands;
+﻿using System;
+using Server.Authentication.Commands;
 using Server.Authentication.Responses;
 using Server.Core;
 using Server.Tools;
@@ -35,26 +36,30 @@ namespace Server.Authentication
 
         public LoginResponse Consume(ICommandContext context, LoginCommand command)
         {
-            var table = context.Table<IUsersTable>();
-            var user = table.FindByIdOrDefault(command.UserName);
-            if (user == null || !PasswordHasher.VerifyPassword(command.Password, user.Password, user.Salt))
+            var usersTable = context.Table<IUsersTable>();
+            var user = usersTable.FindByIdOrDefault(command.UserName);
+            if (user == null || !user.Enabled || !PasswordHasher.VerifyPassword(command.Password, user.Password, user.Salt))
                 return new LoginResponse { Result = ResponseType.IncorrectLoginData };
+            user.LastLogin = DateTime.UtcNow;
+            usersTable.Update(user);
             var session = _sessionManager.CreateSession(command.UserName);
             var response = new LoginResponse { SessionId = session.SessionId, Result = ResponseType.Success };
             if (command.RememberMe)
             {
                 response.PermanentSessionId = PasswordHasher.GeneratePermanentSessionId();
                 user.PermanentSessionId = response.PermanentSessionId;
-                table.Update(user);
+                usersTable.Update(user);
             }
             return response;
         }
         public PermanentLoginResponse Consume(ICommandContext context, PermanentLoginCommand command)
         {
-            var table = context.Table<IUsersTable>();
-            var user = table.FindByIdOrDefault(command.Name);
-            if (user == null || user.PermanentSessionId != command.Token)
+            var usersTable = context.Table<IUsersTable>();
+            var user = usersTable.FindByIdOrDefault(command.Name);
+            if (user == null || !user.Enabled || user.PermanentSessionId != command.Token)
                 return new PermanentLoginResponse { Result = ResponseType.IncorrectLoginData };
+            user.LastLogin = DateTime.UtcNow;
+            usersTable.Update(user);
             var session = _sessionManager.CreateSession(user.Name);
             return new PermanentLoginResponse
             {

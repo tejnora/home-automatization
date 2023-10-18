@@ -23,9 +23,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import ChnagePassworIcon from '@mui/icons-material/Password';
 import { usersClient, IUserListResponse } from "../services/usersApi"
 import { suspend } from 'suspend-react'
 import CreateUserDialog from './createUserDialog';
+import ChangePasswordDialog from './userChangePasswordDialog'
 
 let idCounter = 0;
 
@@ -42,15 +44,19 @@ interface IRowData extends GridValidRowModel {
   enabled: boolean;
 }
 
+interface DataControlProps {
+  updatePassword(name: string): void;
+}
+
 function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel } = props;
-  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [openCreateUserDialog, setOpenCreateUserDialog] = useState(false);
   const handleClick = () => {
-    setOpenPasswordDialog(true);
+    setOpenCreateUserDialog(true);
   };
   return (
     <GridToolbarContainer>
-      <CreateUserDialog openDialog={openPasswordDialog} setOpenDialog={setOpenPasswordDialog} createUser={
+      <CreateUserDialog openDialog={openCreateUserDialog} setOpenDialog={setOpenCreateUserDialog} createUser={
         (user: string, password: string) => {
           const id = idCounter++;
           setRows((oldRows) => [...oldRows, { id, name: user, password: password, isNew: true }]);
@@ -66,7 +72,7 @@ function EditToolbar(props: EditToolbarProps) {
   );
 }
 
-const DataControlLazy = () => {
+const DataControlLazy = (props: DataControlProps) => {
   const [rows, setRows] = useState<GridRowsProp<IRowData>>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [load, setLoad] = useState(true);
@@ -110,6 +116,12 @@ const DataControlLazy = () => {
     setRows(rows.filter((row) => row.id !== id));
   };
 
+  const handleChnagePassword = (id: GridRowId) => () => {
+    const rowItem = rows.find((row) => row.id === id);
+    if (rowItem === undefined) return;
+    props.updatePassword(rowItem.name);
+  }
+
   const handleCancelClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true }, });
     const editedRow = rows.find((row) => row.id === id);
@@ -145,7 +157,11 @@ const DataControlLazy = () => {
       ),
       renderEditCell: (params: GridRenderEditCellParams) => (
         <Checkbox checked={params.value} onChange={
-          (e,value) => params.value = !params.value} />
+          (e, newValue) => {
+            const { id, api, field } = params;
+            api.setEditCellValue({ id, field, value: newValue });
+          }
+        } />
       ),
     },
     { field: 'name', headerName: 'Name', width: 250, editable: false },
@@ -155,7 +171,10 @@ const DataControlLazy = () => {
       width: 220,
       editable: false,
       valueGetter: (params) => {
-        return params.row.lastLogin?.toString();
+        if (params.row.lastLogin == null || params.row.lastLogin.getYear() === 70) {
+          return "N/A"
+        }
+        return params.row.lastLogin?.toLocaleString([], { dateStyle: 'short' });
       }
     },
     {
@@ -180,7 +199,7 @@ const DataControlLazy = () => {
               className="textPrimary"
               onClick={handleCancelClick(id)}
               color="inherit"
-            />,
+            />
           ];
         }
 
@@ -198,6 +217,12 @@ const DataControlLazy = () => {
             onClick={handleDeleteClick(id)}
             color="inherit"
           />,
+          <GridActionsCellItem
+            icon={<ChnagePassworIcon />}
+            label="ChangePassword"
+            onClick={handleChnagePassword(id)}
+            color="inherit"
+          />
         ];
       },
     },
@@ -222,6 +247,14 @@ const DataControlLazy = () => {
 }
 
 export const UserView = () => {
+  const [changePasswordDialog, setChangePasswordDialog] = useState(false);
+  const [changePasswordUserName, setchangePasswordUserName] = useState("");
+
+  const handleSaveClick = (userName: string) => {
+    setChangePasswordDialog(true);
+    setchangePasswordUserName(userName);
+  };
+
   return (
     <div>
       <CssBaseline />
@@ -233,8 +266,9 @@ export const UserView = () => {
       }}
       >
         <Title>Users</Title>
+        <ChangePasswordDialog openDialog={changePasswordDialog} setOpenDialog={setChangePasswordDialog} userName={changePasswordUserName} />
         <Suspense fallback={"Loading..."}>
-          <DataControlLazy />
+          <DataControlLazy updatePassword={(n) => handleSaveClick(n)} />
         </Suspense>
       </Paper>
     </div>

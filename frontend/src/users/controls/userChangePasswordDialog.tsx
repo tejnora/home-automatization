@@ -13,11 +13,11 @@ import { useService } from "../../core/useService"
 interface ChangePasswordDialogProps {
     openDialog: boolean;
     setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    userName: string;
 }
 export default function ChangePasswordDialog(props: ChangePasswordDialogProps) {
     const newPasswordRef = useRef<HTMLInputElement>(null)
     const originPasswordRef = useRef<HTMLInputElement>(null)
-    const auth = useService().Authentification;
 
     const handleClose = () => {
         props.setOpenDialog(false);
@@ -28,7 +28,7 @@ export default function ChangePasswordDialog(props: ChangePasswordDialogProps) {
         const newPass = newPasswordRef.current?.value;
         const originPass = originPasswordRef.current?.value;
         if (!newPass || !originPass) return;
-        usersClient.userChangePassword(auth.userName, newPass, originPass);
+        usersClient.userChangePassword(props.userName, newPass, originPass);
     }
 
     return (

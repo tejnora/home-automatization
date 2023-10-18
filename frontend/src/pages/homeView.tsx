@@ -138,6 +138,7 @@ function UserMenu() {
     const authentification = useService().Authentification;
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [changePssowordDialog, setChangePssowordDialog] = useState(false);
+    const auth = useService().Authentification;
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
@@ -159,7 +160,7 @@ function UserMenu() {
 
     return (
         <div>
-            <ChangePasswordDialog openDialog={changePssowordDialog} setOpenDialog={setChangePssowordDialog} />
+            <ChangePasswordDialog openDialog={changePssowordDialog} setOpenDialog={setChangePssowordDialog} userName={auth.userName} />
             <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
