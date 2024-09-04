@@ -67,7 +67,10 @@ public class MqttClientWrapper : IMqttClient
 
     public MqttClientWrapper(ServerOptions _config)
     {
-        _client = new MqttClient(IPAddress.Parse(_config.MqttClientAddress));
+        var ipSetting = _config.MqttClientAddress.Split(":");
+        if (ipSetting.Length != 2)
+            throw new Exception($"MqttClientAddress '{_config.MqttClientAddress}'is not valid.");
+        _client = new MqttClient(IPAddress.Parse(ipSetting[0]), int.Parse(ipSetting[1]), false, null, null, MqttSslProtocols.None);
         _client.MqttMsgPublishReceived += OnPublishArrived;
         _client.ConnectionClosed += OnConnectionLost;
         Connect();

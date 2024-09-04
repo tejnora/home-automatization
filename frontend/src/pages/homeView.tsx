@@ -31,6 +31,7 @@ import { useService } from "../core/useService"
 import ChangePasswordDialog from "../users/controls/userChangePasswordDialog"
 import { useNavigate, Routes, Route } from "react-router-dom";
 import { UserView } from "../users/controls/userView"
+import { DoorView } from "../door/controls/doorView"
 
 
 const settingItems = ['Change password', 'Logout'];
@@ -45,7 +46,7 @@ const menuItems = [
         name: "Doors",
         link: "Doors",
         icon: <LayersIcon />,
-        page: <Paper />
+        page: <DoorView />
     },
     {
         name: "Users",

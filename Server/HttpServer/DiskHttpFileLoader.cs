@@ -10,33 +10,27 @@ public class DiskHttpFileLoader
 {
     readonly string _root;
 
-    public DiskHttpFileLoader()
+    public DiskHttpFileLoader(ServerOptions serverOptions)
     {
-        _root = Path.Combine("/var/www/home.geodetka.eu/htdocs", @"Html");
+        _root = serverOptions.HttpRooDirectory;
     }
-    public bool TryGetWebFileContent(string[] path, out byte[] content)
+
+    public Task<byte[]> TryGetWebFileContent(string[] path)
     {
-        content = null;
         try
         {
             var filePath = Path.Combine(_root, Path.Combine(path));
-            if (filePath.IndexOf("/var/www/home.geodetka.eu/htdocs", StringComparison.Ordinal) != 0)
+            if (filePath.IndexOf(_root, StringComparison.Ordinal) != 0)
             {
-                return false;
+                return null;
             }
-            content = File.ReadAllBytes(filePath);
-            return true;
+            return File.ReadAllBytesAsync(filePath);
         }
         catch (Exception ex)
         {
             Log.Error(ex.ToString());
         }
-        content = null;
-        return false;
-    }
+        return null;
 
-    public Task<byte[]> TryGetWebFileContent(string[] path)
-    {
-        throw new NotImplementedException();
     }
 }

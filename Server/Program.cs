@@ -12,6 +12,10 @@ using System.IO;
 using Server.Tools.MessageMapping;
 using Server.Authentication;
 using WebCommandsList = Server.HttpServer.WebCommandsList;
+using Server.Door;
+using Server.Mqtt;
+using Server.Core.Mqtt;
+using System.Text;
 
 namespace Server
 {
@@ -19,6 +23,9 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            var provider = CodePagesEncodingProvider.Instance;
+            Encoding.RegisterProvider(provider);
+
             LocConfiguration();
             NameAndVersionReporter.Print();
             UnhandledExceptionHandler.AttachHandlers();
@@ -36,8 +43,11 @@ namespace Server
             builder.RegisterType<DataStorage>().As<IDataStorage>().SingleInstance();
             builder.RegisterType<SessionMiddlewareApi>().As<IRestApi>().SingleInstance();
             builder.RegisterType<SessionManager>().As<ISessionManager>().SingleInstance();
+            builder.RegisterType<DoorMqttClient>().AsSelf().SingleInstance();
+            builder.RegisterType<MqttClientWrapper>().As<IMqttClient>().SingleInstance();
 #if DEBUG
-            builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
+           // builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
+            builder.RegisterType<DiskHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
 #else
             builder.RegisterType<DiskHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
 #endif 
@@ -72,8 +82,14 @@ namespace Server
             return new ServerOptions
             {
                 DatabaseCollectionPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath),DatabaseConfigSection.GetConfiguration().DiskFileCollection),
+                MqttClientAddress= "192.168.88.250:1883",
+#if DEBUG
                 HttpServerConnectionPort = 80,
-                MqttClientAddress= "tcp://192.168.88.250:1883"
+                HttpRooDirectory = @"c:\_Data\Repos\home-automatization\frontend\build\"
+#else
+                HttpServerConnectionPort = 5000,
+                HttpRooDirectory = "/var/www/home.geodetka.eu/htdocs"
+#endif
             };
         }
 
