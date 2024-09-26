@@ -85,7 +85,8 @@ namespace Server
                 MqttClientAddress= "192.168.88.250:1883",
 #if DEBUG
                 HttpServerConnectionPort = 80,
-                HttpRooDirectory = @"c:\_Data\Repos\home-automatization\frontend\build\"
+                HttpRooDirectory = @"c:\_Data\Repos\home-automatization\frontend\build\",
+                ImagesRootDirectory= @"c:\_Data\"
 #else
                 HttpServerConnectionPort = 5000,
                 HttpRooDirectory = "/var/www/home.geodetka.eu/htdocs"

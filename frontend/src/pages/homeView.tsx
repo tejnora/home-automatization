@@ -22,6 +22,7 @@ import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LayersIcon from '@mui/icons-material/Layers';
 import PeopleIcon from '@mui/icons-material/People';
+import ImageIcon from '@mui/icons-material/Image'
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -32,7 +33,7 @@ import ChangePasswordDialog from "../users/controls/userChangePasswordDialog"
 import { useNavigate, Routes, Route } from "react-router-dom";
 import { UserView } from "../users/controls/userView"
 import { DoorView } from "../door/controls/doorView"
-
+import {ImageGalleryView} from "../imagegallery/controls/imageGallaryView"
 
 const settingItems = ['Change password', 'Logout'];
 const menuItems = [
@@ -47,6 +48,12 @@ const menuItems = [
         link: "Doors",
         icon: <LayersIcon />,
         page: <DoorView />
+    },
+    {
+        name: "Image Gallery",
+        link: "ImageGallery",
+        icon: <ImageIcon />,
+        page: <ImageGalleryView />
     },
     {
         name: "Users",
