@@ -55,7 +55,7 @@ class ApiGenerator
     {
         _outputCodeStack[0].Append(_outputCode);
         _outputCode = _outputCodeStack[^1];
-        _outputCodeStack.RemoveAt(_outputCodeStack.Count-1);
+        _outputCodeStack.RemoveAt(_outputCodeStack.Count - 1);
     }
     void EmitResponseInterfaces()
     {
@@ -141,13 +141,32 @@ class ApiGenerator
                 _interfaces.Add(outputType);
             }
             _methodsCode.AppendLine($"    async {methodWithParamsDef}{{");
-            _methodsCode.AppendLine($"        return this.profileApiClient.get<{responseInterface}>(\"api/{_service.Name.ToLowerInvariant()}/{inputType.Name}\");");
+            if (fncParams.Any())
+            {
+                _methodsCode.AppendLine($"        return this.profileApiClient.getWithParams<{responseInterface}>(\"api/{_service.Name.ToLowerInvariant()}/{inputType.Name}\", {GetParamsForGet(fncParams)});");
+            }
+            else
+            {
+                _methodsCode.AppendLine($"        return this.profileApiClient.get<{responseInterface}>(\"api/{_service.Name.ToLowerInvariant()}/{inputType.Name}\");");
+            }
             _methodsCode.AppendLine("    }");
             _methodsCode.AppendLine("");
 
             _IMethodCode.AppendLine($"    {methodWithParamsDef};");
         }
 
+    }
+
+    string GetParamsForGet(IEnumerable<PropertyInfo> values)
+    {
+        var result = new StringBuilder();
+        result.Append("{");
+        foreach (var value in values)
+        {
+            result.Append($"{value.Name}:{ToLowerCase(value.Name)},");
+        }
+        result[^1] = '}';
+        return result.ToString();
     }
 
     void EmitServiceExport()

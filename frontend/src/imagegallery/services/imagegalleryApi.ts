@@ -2,8 +2,13 @@
 import { IApiClient, apiClient } from '../../core/api/apiClient';
 import { IResponseBase } from "../../core/api/responseBase"
 
+export interface IImageInfo{
+   Name: string;
+   Src: string;
+}
+
 export interface IImagesListResponse extends IResponseBase {
-   Images: Array<string>;
+   Images: Array<IImageInfo>;
 }
 
 export interface IImageGroupsResponse extends IResponseBase {
@@ -11,7 +16,7 @@ export interface IImageGroupsResponse extends IResponseBase {
 }
 
 export interface IImageGalleryClient {
-    imagesList(nameOfGroup: string): Promise<IImagesListResponse>;
+    imagesList(imagesGroup: string): Promise<IImagesListResponse>;
     listOfImageGroups(): Promise<IImageGroupsResponse>;
 }
 
@@ -22,8 +27,8 @@ class ImageGalleryClient implements IImageGalleryClient {
        this.profileApiClient = apiClient;
     }
 
-    async imagesList(nameOfGroup: string): Promise<IImagesListResponse>{
-        return this.profileApiClient.get<IImagesListResponse>("api/imagegallery/ImagesListQuery");
+    async imagesList(imagesGroup: string): Promise<IImagesListResponse>{
+        return this.profileApiClient.getWithParams<IImagesListResponse>("api/imagegallery/ImagesListQuery", {ImagesGroup:imagesGroup});
     }
 
     async listOfImageGroups(): Promise<IImageGroupsResponse>{

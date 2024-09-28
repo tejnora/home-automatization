@@ -89,7 +89,8 @@ namespace Server
                 ImagesRootDirectory= @"c:\_Data\"
 #else
                 HttpServerConnectionPort = 5000,
-                HttpRooDirectory = "/var/www/home.geodetka.eu/htdocs"
+                HttpRooDirectory = "/var/www/home.geodetka.eu/htdocs",
+                ImagesRootDirectory="/home/samba/share/Zaloha/David/Foto/"
 #endif
             };
         }

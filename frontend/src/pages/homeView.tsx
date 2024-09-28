@@ -271,7 +271,7 @@ export const HomeView = observer(() => {
                     <Routes>
                         {
                             menuItems.map((n) => {
-                                return (<Route path={`/${n.link}`} element={n.page} />);
+                                return (<Route key={n.link} path={`/${n.link}`} element={n.page} />);
                             })
                         }
                     </Routes>

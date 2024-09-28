@@ -7,13 +7,14 @@ export interface IApiClient {
   patch<TRequest, TResponse>(path: string, object: TRequest): Promise<TResponse>;
   put<TRequest, TResponse>(path: string, object: TRequest): Promise<TResponse>;
   get<TResponse>(path: string): Promise<TResponse>;
+  getWithParams<TResponse>(path: string, paramsData: any): Promise<TResponse>;
 }
 
 class ApiClient implements IApiClient {
   private client: AxiosInstance;
 
   protected createAxiosClient(): AxiosInstance {
-    const client= Axios.create({
+    const client = Axios.create({
       baseURL: /*AppConfig.baseURL*/"",
       responseType: 'json' as const,
       headers: {
@@ -21,11 +22,11 @@ class ApiClient implements IApiClient {
       },
       timeout: 10 * 1000,
     });
-    client.interceptors.response.use((originalResponse: any )=> {
+    client.interceptors.response.use((originalResponse: any) => {
       this.handleDates(originalResponse.data)
       return originalResponse;
     });
-  return client;    
+    return client;
   }
 
   private readonly isoDateFormat = /\/+Date\(([\d+-]+)\)\/+/;
@@ -33,30 +34,30 @@ class ApiClient implements IApiClient {
   private isIsoDateString(value: any): boolean {
     return value && typeof value === "string" && this.isoDateFormat.test(value);
   }
-  
+
   private handleDates(body: any) {
     if (body === null || body === undefined || typeof body !== "object")
       return body;
-  
+
     for (const key of Object.keys(body)) {
       const value = body[key];
-      if (this.isIsoDateString(value)){ 
+      if (this.isIsoDateString(value)) {
         body[key] = (<string>value).toDateTime();
       }
-      else if (typeof value === "object"){
-         this.handleDates(value);
-        }
+      else if (typeof value === "object") {
+        this.handleDates(value);
+      }
     }
-  }  
+  }
 
   constructor() {
     this.client = this.createAxiosClient();
-    
+
   }
 
   async post<TResponse>(path: string, payload: any): Promise<TResponse> {
     try {
-      const response = await this.client.post<TResponse>(path, payload, {withCredentials: true});
+      const response = await this.client.post<TResponse>(path, payload, { withCredentials: true });
       return response.data;
     } catch (error) {
       Logger.logServiceError(error);
@@ -87,6 +88,16 @@ class ApiClient implements IApiClient {
   async get<TResponse>(path: string): Promise<TResponse> {
     try {
       const response = await this.client.get<TResponse>(path);
+      return response.data;
+    } catch (error) {
+      Logger.logServiceError(error);
+    }
+    return {} as TResponse;
+  }
+
+  async getWithParams<TResponse>(path: string, paramsData: any): Promise<TResponse> {
+    try {
+      const response = await this.client.get<TResponse>(path, { params: paramsData });
       return response.data;
     } catch (error) {
       Logger.logServiceError(error);

@@ -9,8 +9,11 @@ using System.Threading.Tasks;
 using BTDB.IOC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Serilog;
 using Server.Core;
+using Server.ImageGallery.Queries;
+using Server.ImageGallery.Responses;
 using Server.Tools;
 using Server.Tools.JsonSerializer;
 using Share;
@@ -63,6 +66,10 @@ public class HttpHandler
             {
                 await ProcessHttpRequest(requestPathFragments, httpContext);
             }
+            else if (requestPathFragments[0] == "img")
+            {
+                await ProcessHttpImgRequest(requestPathFragments, httpContext);
+            }
             else
             {
                 var fileContent = await _httpFileLoader.TryGetWebFileContent(requestPathFragments);
@@ -94,6 +101,57 @@ public class HttpHandler
         }
     }
 
+
+    async Task ProcessHttpImgRequest(IList<string> path, HttpContext httpContext)
+    {
+        if (path.Count != 3)
+        {
+            SetNotFoundStatus(httpContext);
+            return;
+        }
+        switch (httpContext.Request.Method)
+        {
+            case "GET":
+                await HandleImgGet(path[1],path[2], httpContext);
+                break;
+            default:
+                SetNotFoundStatus(httpContext);
+                break;
+        }
+
+    }
+
+    async Task HandleImgGet(string imagesGroup, string imageName, HttpContext httpContext)
+    {
+        try
+        {
+            var height = -1;
+            if (httpContext.Request.Query.TryGetValue("h",  out var hValues) && hValues.Count==1)
+            {
+                height = int.Parse(hValues[0]);
+            }
+
+            var width = -1;
+            if (httpContext.Request.Query.TryGetValue("w", out var wValues) && wValues.Count == 1)
+            {
+                width = int.Parse(wValues[0]);
+            }
+            var imageQuery = new ImageQuery { ImagesGroup = imagesGroup, ImageName = imageName, Height = height, Width = width};
+            var responseDto = await _restApi.Query(new QueryContextBase(httpContext), imageQuery) as ImageDataResponse;
+            SetSuccessStatus(httpContext);
+            SetResponseHeaders(httpContext.Response, new[] { responseDto.Name });
+            if (responseDto.Data == null)
+            {
+                SetNotFoundStatus(httpContext);
+                return;
+            }
+            await httpContext.Response.Body.WriteAsync(responseDto.Data, 0, responseDto.Data.Length);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.ToString());
+        }
+    }
     async Task HandleApiGet(string requestString, HttpContext httpContext)
     {
         if (!_getCommands.TryGetValue(requestString, out var commandType))
@@ -104,6 +162,15 @@ public class HttpHandler
         try
         {
             var comm = (Define.IRequest)Activator.CreateInstance(commandType);
+            var commType = comm.GetType();
+            foreach (var query in httpContext.Request.Query)
+            {
+                var property = commType.GetProperty(query.Key);
+                if (property == null)
+                    continue;
+                property.SetValue(comm, query.Value.First());
+
+            }
             var responseDto = await _restApi.Query(new QueryContextBase(httpContext), comm);
             await ReturnJson(responseDto, httpContext);
         }

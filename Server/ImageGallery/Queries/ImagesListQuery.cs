@@ -8,5 +8,5 @@ namespace Server.ImageGallery.Queries;
 [Session]
 public class ImagesListQuery : Define.IRequest
 {
-    public string NameOfGroup { get; set; }
+    public string ImagesGroup { get; set; }
 }
