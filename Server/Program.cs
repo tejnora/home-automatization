@@ -1,8 +1,8 @@
 ﻿using Server.Tools;
 using BTDB.IOC;
 using BTDB.KVDBLayer;
-using Server.Configuration;
 using System;
+using System.Configuration;
 using Server.Storage;
 using Serilog;
 using IContainer = BTDB.IOC.IContainer;
@@ -46,7 +46,7 @@ namespace Server
             builder.RegisterType<DoorMqttClient>().AsSelf().SingleInstance();
             builder.RegisterType<MqttClientWrapper>().As<IMqttClient>().SingleInstance();
 #if DEBUG
-           // builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
+            // builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
             builder.RegisterType<DiskHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
 #else
             builder.RegisterType<DiskHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
@@ -79,20 +79,36 @@ namespace Server
 
         static ServerOptions InitServerOptions()
         {
+#if DEBUG
+            var dbCollection = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath),"DiskFileCollection");
             return new ServerOptions
             {
-                DatabaseCollectionPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath),DatabaseConfigSection.GetConfiguration().DiskFileCollection),
+                DatabaseCollectionPath = "DiskFileCollection",
                 MqttClientAddress= "192.168.88.250:1883",
-#if DEBUG
                 HttpServerConnectionPort = 80,
                 HttpRooDirectory = @"c:\_Data\Repos\home-automatization\frontend\build\",
                 ImagesRootDirectory= @"c:\_Data\"
-#else
-                HttpServerConnectionPort = 5000,
-                HttpRooDirectory = "/var/www/home.geodetka.eu/htdocs",
-                ImagesRootDirectory="/home/samba/share/Zaloha/David/Foto/"
-#endif
             };
+#else
+            try
+            {
+                var dbCollection = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), ConfigurationManager.AppSettings["DiskFileCollection"]);
+                return new ServerOptions
+                {
+                    DatabaseCollectionPath = dbCollection,
+                    MqttClientAddress = ConfigurationManager.AppSettings["MqttClientAddress"],
+                    HttpServerConnectionPort = int.Parse(ConfigurationManager.AppSettings["HttpServerConnectionPort"]),
+                    HttpRooDirectory = ConfigurationManager.AppSettings["HttpRooDirectory"],
+                    ImagesRootDirectory = ConfigurationManager.AppSettings["ImagesRootDirectory"]
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Config option cannot be read. {ex}");
+                Environment.Exit(1);
+            }
+#endif
+            return null;
         }
 
         static void Run(IContainer container)

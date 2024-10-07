@@ -56,61 +56,62 @@ public class ImageGalleryQueryHandler
     public ImageDataResponse Consume(IQueryContext consumeContext, ImageQuery request)
     {
         var path = Path.Combine(_imagesGroups[request.ImagesGroup], HttpUtility.HtmlDecode(request.ImageName));
-        var imageData = File.ReadAllBytes(path);
-        if (request.Height != -1 && request.Width != -1)
+        try
         {
-            imageData = ResizeImage(File.ReadAllBytes(path), request.Width, request.Height);
+            var imageData = File.ReadAllBytes(path);
+            if (request.Height != -1 && request.Width != -1)
+            {
+                imageData = ResizeImage(File.ReadAllBytes(path), request.Width, request.Height);
+            }
+            return new ImageDataResponse { Data = imageData, Name = request.ImageName };
         }
-        return new ImageDataResponse { Data = imageData, Name = request.ImageName };
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"File {path} cannot be converted.{ex}");
+        }
+        return new ImageDataResponse { Data = null, Name = request.ImageName };
     }
 
     public static byte[] ResizeImage(byte[] data, int width, int height)
     {
-        try
+        using var ms = new MemoryStream(data);
+        var imgPhoto = Image.FromStream(ms);
+        var sourceWidth = imgPhoto.Width;
+        var sourceHeight = imgPhoto.Height;
+        var sourceX = 0;
+        var sourceY = 0;
+        var destX = 0;
+        var destY = 0;
+
+        float nPercent = 0;
+        float nPercentW = 0;
+        float nPercentH = 0;
+
+        nPercentW = ((float)width / (float)sourceWidth);
+        nPercentH = ((float)height / (float)sourceHeight);
+        if (nPercentH < nPercentW)
         {
-            using var ms = new MemoryStream(data);
-            var imgPhoto = Image.FromStream(ms);
-            var sourceWidth = imgPhoto.Width;
-            var sourceHeight = imgPhoto.Height;
-            var sourceX = 0;
-            var sourceY = 0;
-            var destX = 0;
-            var destY = 0;
-
-            float nPercent = 0;
-            float nPercentW = 0;
-            float nPercentH = 0;
-
-            nPercentW = ((float)width / (float)sourceWidth);
-            nPercentH = ((float)height / (float)sourceHeight);
-            if (nPercentH < nPercentW)
-            {
-                nPercent = nPercentH;
-                destX = Convert.ToInt16((width - (sourceWidth * nPercent)) / 2);
-            }
-            else
-            {
-                nPercent = nPercentW;
-                destY = Convert.ToInt16((height - (sourceHeight * nPercent)) / 2);
-            }
-
-            var destWidth = (int)(sourceWidth * nPercent);
-            var destHeight = (int)(sourceHeight * nPercent);
-
-            var newImageBitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            newImageBitmap.SetResolution(imgPhoto.HorizontalResolution, imgPhoto.VerticalResolution);
-
-            var grPhoto = Graphics.FromImage(newImageBitmap);
-            grPhoto.Clear(Color.Transparent);
-            grPhoto.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            grPhoto.DrawImage(imgPhoto, new Rectangle(destX, destY, destWidth, destHeight), new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), GraphicsUnit.Pixel);
-            grPhoto.Dispose();
-            var converter = new ImageConverter();
-            return (byte[])converter.ConvertTo(newImageBitmap, typeof(byte[]));
+            nPercent = nPercentH;
+            destX = Convert.ToInt16((width - (sourceWidth * nPercent)) / 2);
         }
-        catch
+        else
         {
-            return null;
+            nPercent = nPercentW;
+            destY = Convert.ToInt16((height - (sourceHeight * nPercent)) / 2);
         }
+
+        var destWidth = (int)(sourceWidth * nPercent);
+        var destHeight = (int)(sourceHeight * nPercent);
+
+        var newImageBitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        newImageBitmap.SetResolution(imgPhoto.HorizontalResolution, imgPhoto.VerticalResolution);
+
+        var grPhoto = Graphics.FromImage(newImageBitmap);
+        grPhoto.Clear(Color.Transparent);
+        grPhoto.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        grPhoto.DrawImage(imgPhoto, new Rectangle(destX, destY, destWidth, destHeight), new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), GraphicsUnit.Pixel);
+        grPhoto.Dispose();
+        var converter = new ImageConverter();
+        return (byte[])converter.ConvertTo(newImageBitmap, typeof(byte[]));
     }
 }

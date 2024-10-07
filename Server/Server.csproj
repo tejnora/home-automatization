@@ -22,6 +22,14 @@
 
   <ItemGroup>
     <Folder Include="Authentication\Queries\" />
+    <Folder Include="Configuration\" />
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Configuration\App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Debug'">
