@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -10,6 +9,7 @@ using Serilog;
 using Server.Core;
 using Server.ImageGallery.Queries;
 using Server.ImageGallery.Responses;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace Server.ImageGallery;
 
@@ -48,7 +48,7 @@ public class ImageGalleryQueryHandler
             Images = images.Select((imagePath) =>
             {
                 var imageName = Path.GetFileName(imagePath);
-                return new ImageInfo() { Name = imageName, Src = HttpUtility.HtmlEncode(imageName) };
+                return new Responses.ImageInfo() { Name = imageName, Src = HttpUtility.HtmlEncode(imageName) };
             }).ToList()
         };
     }
@@ -74,6 +74,8 @@ public class ImageGalleryQueryHandler
 
     public static byte[] ResizeImage(byte[] data, int width, int height)
     {
+        try
+        {
         using var ms = new MemoryStream(data);
         var imgPhoto = Image.FromStream(ms);
         var sourceWidth = imgPhoto.Width;
@@ -82,6 +84,24 @@ public class ImageGalleryQueryHandler
         var sourceY = 0;
         var destX = 0;
         var destY = 0;
+        try
+        {
+            using var inputStream = new MemoryStream(data);
+            using var image = Image.Load(inputStream);
+            image.Mutate(x => x.Resize(width, 0, KnownResamplers.Lanczos3));
+            using var outputStream = new MemoryStream();
+            image.Save(outputStream, new PngEncoder());
+            return outputStream.GetBuffer();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+  /*  public static byte[] ResizeImage(byte[] data, int width, int height)
+    {
+        try
+        {
 
         float nPercent = 0;
         float nPercentW = 0;
@@ -114,4 +134,5 @@ public class ImageGalleryQueryHandler
         var converter = new ImageConverter();
         return (byte[])converter.ConvertTo(newImageBitmap, typeof(byte[]));
     }
+  */
 }

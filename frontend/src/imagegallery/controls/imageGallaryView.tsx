@@ -104,8 +104,8 @@ function ImagesList(props: IImagesListProps) {
                 {imagesList.map((item) => (
                     <ImageListItem key={item.Src}>
                         <img
-                            srcSet={`img/${props.imageGroup}/${item.Src}?w=248&h=248&fit=crop&auto=format&dpr=2 2x`}
-                            src={`img/${props.imageGroup}/${item.Src}?w=248&h=248&fit=crop&auto=format`}
+                            srcSet={`img/${props.imageGroup}/${item.Src}?w=128&h=128&fit=crop&auto=format&dpr=2 2x`}
+                            src={`img/${props.imageGroup}/${item.Src}?w=128&h=128&fit=crop&auto=format`}
                             alt={item.Name}
                             loading="lazy"
                             onClick={() => { setBackdropImage(item.Src) }}
