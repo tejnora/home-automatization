@@ -16,6 +16,7 @@ using Server.Door;
 using Server.Mqtt;
 using Server.Core.Mqtt;
 using System.Text;
+using Server.ImageGallery;
 
 namespace Server
 {
@@ -45,6 +46,7 @@ namespace Server
             builder.RegisterType<SessionManager>().As<ISessionManager>().SingleInstance();
             builder.RegisterType<DoorMqttClient>().AsSelf().SingleInstance();
             builder.RegisterType<MqttClientWrapper>().As<IMqttClient>().SingleInstance();
+            builder.RegisterType<ImagePreviewCache>().As<IImagePreviewCache>().SingleInstance();
 #if DEBUG
             // builder.RegisterType<DebugHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();
             builder.RegisterType<DiskHttpFileLoader>().As<IHttpFileLoader>().SingleInstance();

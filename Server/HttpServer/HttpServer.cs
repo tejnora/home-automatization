@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Server.HttpServer;
 
-internal class HttpServer : IHttpServer
+public class HttpServer : IHttpServer
 {
     IWebHost _webServer;
     readonly int _connectionPort;

@@ -2,7 +2,7 @@
   "profiles": {
     "ApiGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\_Data\\Repos\\home-automatization\\Server\\bin\\Debug\\net7.0\\Server.dll  c:\\_Data\\Repos\\home-automatization\\frontend\\src"
+      "commandLineArgs": "e:\\Repozitories\\home-automatization\\Server\\bin\\Debug\\net8.0\\Server.dll   e:\\Repozitories\\home-automatization\\frontend\\src\\"
     }
   }
 }
